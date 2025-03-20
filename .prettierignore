@@ -1,0 +1,10 @@
+node_modules
+.github
+.idea
+.nycrc
+CHANGELOG.md
+typechain
+abi
+build
+build-esm
+tests/files

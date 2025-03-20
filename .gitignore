@@ -1,0 +1,11 @@
+build
+build-esm
+node_modules
+coverage
+docs
+tests/build
+typechain
+!src/typechain
+
+.idea
+.vscode
