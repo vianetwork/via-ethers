@@ -19,6 +19,7 @@ import {
   L2_CHAIN_URL,
   L1_CHAIN_URL,
   DAI,
+  L1_ADDRESS1,
 } from '../utils';
 
 const {expect} = chai;
@@ -120,7 +121,7 @@ describe('SmartAccount', async () => {
   describe('#getAllBalances()', () => {
     it('should return all balances', async () => {
       const result = await account.getAllBalances();
-      const expected = 2;
+      const expected = 1;
       expect(Object.keys(result)).to.have.lengthOf(expected);
     });
   });
@@ -396,13 +397,13 @@ describe('SmartAccount', async () => {
 
   describe('#withdraw()', () => {
     it('should withdraw BTC to the L1 network', async () => {
-      const amount = 7_000_000_000n;
+      const amount = 10_000_000_000n;
       const l2BalanceBeforeWithdrawal = await account.getBalance();
       const withdrawTx = await account.withdraw({
-        to: await account.getAddress(),
+        to: L1_ADDRESS1,
         amount: amount,
       });
-      await withdrawTx.waitFinalize();
+      await withdrawTx.wait();
 
       const l2BalanceAfterWithdrawal = await account.getBalance();
       expect(l2BalanceBeforeWithdrawal - l2BalanceAfterWithdrawal >= amount).to
@@ -410,7 +411,7 @@ describe('SmartAccount', async () => {
     }).timeout(90_000);
 
     it('should withdraw BTC to the L1 network using paymaster to cover fee', async () => {
-      const amount = 7_000_000_000n;
+      const amount = 10_000_000_000n;
       const minimalAllowance = 1n;
 
       const paymasterBalanceBeforeWithdrawal =
@@ -425,7 +426,7 @@ describe('SmartAccount', async () => {
         await account.getBalance(APPROVAL_TOKEN);
 
       const withdrawTx = await account.withdraw({
-        to: await account.getAddress(),
+        to: L1_ADDRESS1,
         amount: amount,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',
@@ -434,7 +435,7 @@ describe('SmartAccount', async () => {
           innerInput: new Uint8Array(),
         }),
       });
-      await withdrawTx.waitFinalize();
+      await withdrawTx.wait();
 
       const paymasterBalanceAfterWithdrawal =
         await provider.getBalance(PAYMASTER);
@@ -468,8 +469,6 @@ describe('SmartAccount', async () => {
 
 describe('MultisigECDSASmartAccount', async () => {
   const provider = new Provider(L2_CHAIN_URL);
-  const ethProvider = ethers.getDefaultProvider(L1_CHAIN_URL);
-  const wallet = new Wallet(PRIVATE_KEY1, provider, ethProvider);
   let account: SmartAccount;
 
   before('setup', async function () {
@@ -515,7 +514,7 @@ describe('MultisigECDSASmartAccount', async () => {
       await deployer.transfer({
         to: multisigAddress,
         token: DAI,
-        amount: 1,
+        amount: 50,
       })
     ).wait();
 
@@ -698,13 +697,13 @@ describe('MultisigECDSASmartAccount', async () => {
 
   describe('#withdraw()', () => {
     it('should withdraw BTC to the L1 network', async () => {
-      const amount = 7_000_000_000n;
+      const amount = 10_000_000_000n;
       const l2BalanceBeforeWithdrawal = await account.getBalance();
       const withdrawTx = await account.withdraw({
-        to: await wallet.getAddress(), // send to L1 EOA since AA does not exit on L1
+        to: L1_ADDRESS1,
         amount: amount,
       });
-      await withdrawTx.waitFinalize();
+      await withdrawTx.wait();
 
       const l2BalanceAfterWithdrawal = await account.getBalance();
       expect(l2BalanceBeforeWithdrawal - l2BalanceAfterWithdrawal >= amount).to
@@ -712,7 +711,7 @@ describe('MultisigECDSASmartAccount', async () => {
     }).timeout(90_000);
 
     it('should withdraw BTC to the L1 network using paymaster to cover fee', async () => {
-      const amount = 7_000_000_000n;
+      const amount = 10_000_000_000n;
       const minimalAllowance = 1n;
 
       const paymasterBalanceBeforeWithdrawal =
@@ -727,7 +726,7 @@ describe('MultisigECDSASmartAccount', async () => {
         await account.getBalance(APPROVAL_TOKEN);
 
       const withdrawTx = await account.withdraw({
-        to: await wallet.getAddress(), // send to L1 EOA since AA does not exit on L1
+        to: L1_ADDRESS1,
         amount: amount,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',
@@ -736,7 +735,7 @@ describe('MultisigECDSASmartAccount', async () => {
           innerInput: new Uint8Array(),
         }),
       });
-      await withdrawTx.waitFinalize();
+      await withdrawTx.wait();
 
       const paymasterBalanceAfterWithdrawal =
         await provider.getBalance(PAYMASTER);
