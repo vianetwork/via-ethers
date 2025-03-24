@@ -13,6 +13,7 @@ import {
   L1_CHAIN_URL,
   L2_CHAIN_URL,
   DAI,
+  L1_ADDRESS1,
 } from '../utils';
 
 const {expect} = chai;
@@ -56,7 +57,7 @@ describe('Wallet', () => {
   describe('#getAllBalances()', () => {
     it('should return the all balances', async () => {
       const result = await wallet.getAllBalances();
-      const expected = 2;
+      const expected = 1;
       expect(Object.keys(result)).to.have.lengthOf(expected);
     });
   });
@@ -728,13 +729,13 @@ describe('Wallet', () => {
 
   describe('#withdraw()', () => {
     it('should withdraw BTC to the L1 network', async () => {
-      const amount = 7_000_000_000n;
+      const amount = 10_000_000_000n;
       const l2BalanceBeforeWithdrawal = await wallet.getBalance();
       const withdrawTx = await wallet.withdraw({
-        to: await wallet.getAddress(),
+        to: L1_ADDRESS1,
         amount: amount,
       });
-      await withdrawTx.waitFinalize();
+      await withdrawTx.wait();
 
       const l2BalanceAfterWithdrawal = await wallet.getBalance();
       expect(l2BalanceBeforeWithdrawal - l2BalanceAfterWithdrawal >= amount).to
@@ -742,7 +743,7 @@ describe('Wallet', () => {
     }).timeout(90_000);
 
     it('should withdraw BTC to the L1 network using paymaster to cover fee', async () => {
-      const amount = 7_000_000_000n;
+      const amount = 10_000_000_000n;
       const minimalAllowance = 1n;
 
       const paymasterBalanceBeforeWithdrawal =
@@ -757,7 +758,7 @@ describe('Wallet', () => {
         await wallet.getBalance(APPROVAL_TOKEN);
 
       const withdrawTx = await wallet.withdraw({
-        to: await wallet.getAddress(),
+        to: L1_ADDRESS1,
         amount: amount,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',
@@ -766,7 +767,7 @@ describe('Wallet', () => {
           innerInput: new Uint8Array(),
         }),
       });
-      await withdrawTx.waitFinalize();
+      await withdrawTx.wait();
 
       const paymasterBalanceAfterWithdrawal =
         await provider.getBalance(PAYMASTER);

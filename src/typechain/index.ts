@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { Contract2Factory } from "./Contract2Factory";
+export type { IBaseToken } from "./IBaseToken";
 export type { IBridgehub } from "./IBridgehub";
 export type { IContractDeployer } from "./IContractDeployer";
 export type { IERC1271 } from "./IERC1271";
@@ -20,6 +21,7 @@ export type { IZkSync } from "./IZkSync";
 export type { IZkSyncHyperchain } from "./IZkSyncHyperchain";
 export * as factories from "./factories";
 export { Contract2Factory__factory } from "./factories/Contract2Factory__factory";
+export { IBaseToken__factory } from "./factories/IBaseToken__factory";
 export { IBridgehub__factory } from "./factories/IBridgehub__factory";
 export { IContractDeployer__factory } from "./factories/IContractDeployer__factory";
 export { IERC1271__factory } from "./factories/IERC1271__factory";

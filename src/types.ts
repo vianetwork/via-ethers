@@ -18,7 +18,7 @@ import {
 } from './utils';
 import {Provider} from './provider';
 
-/** 0x-prefixed, hex encoded, ethereum account address. */
+/** 0x-prefixed, hex encoded account address. */
 export type Address = string;
 
 /** 0x-prefixed, hex encoded, ECDSA signature. */

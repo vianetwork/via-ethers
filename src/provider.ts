@@ -15,8 +15,13 @@ import {
   JsonRpcPayload,
   resolveProperties,
   FetchRequest,
+  toUtf8Bytes,
 } from 'ethers';
-import {IERC20__factory, IEthToken__factory} from './typechain';
+import {
+  IBaseToken__factory,
+  IERC20__factory,
+  IEthToken__factory,
+} from './typechain';
 import {
   Address,
   TransactionResponse,
@@ -585,12 +590,12 @@ export function JsonRpcApiProvider<
       tx.overrides.value = tx.amount;
       tx.overrides.type ??= EIP712_TX_TYPE;
 
-      const ethL2Token = IEthToken__factory.connect(
+      const baseToken = IBaseToken__factory.connect(
         L2_BASE_TOKEN_ADDRESS,
         this
       );
-      const populatedTx = await ethL2Token.withdraw.populateTransaction(
-        tx.to,
+      const populatedTx = await baseToken.withdraw.populateTransaction(
+        toUtf8Bytes(tx.to),
         tx.overrides
       );
       if (tx.paymasterParams) {
@@ -610,7 +615,7 @@ export function JsonRpcApiProvider<
      * @param transaction The transaction details.
      * @param transaction.amount The amount of token.
      * @param transaction.from The sender's address.
-     * @param transaction.to The recipient's address.
+     * @param transaction.to The L1 recipient's address.
      * @param [transaction.paymasterParams] Paymaster parameters.
      * @param [transaction.overrides] Transaction overrides including `gasLimit`, `gasPrice`, and `value`.
      */

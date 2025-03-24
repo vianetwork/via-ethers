@@ -7,6 +7,7 @@ import {
   ADDRESS2,
   APPROVAL_TOKEN,
   DAI,
+  L1_ADDRESS1,
   L1_CHAIN_URL,
   L2_CHAIN_URL,
   PAYMASTER,
@@ -131,7 +132,7 @@ describe('Provider', () => {
   describe('#getAllAccountBalances()', () => {
     it('should return the all balances of the account at `address`', async () => {
       const result = await provider.getAllAccountBalances(ADDRESS1);
-      const expected = 2;
+      const expected = 1;
       expect(Object.keys(result)).to.have.lengthOf(expected);
     });
   });
@@ -347,14 +348,14 @@ describe('Provider', () => {
       const tx = {
         type: 113,
         from: ADDRESS1,
-        value: 7_000_000_000n,
+        value: 10_000_000_000n,
         to: utils.L2_BASE_TOKEN_ADDRESS,
-        data: '0x51cff8d900000000000000000000000036615cf349d7f6344891b1e7ca7c72883f5dc049',
+        data: '0x0968f2640000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c62637274317178326c6b30756e756b6d3830716d65706a703439687766397a36786e7a307337336b396a35360000000000000000000000000000000000000000',
       };
       const result = await provider.getWithdrawTx({
-        amount: 7_000_000_000n,
-        to: ADDRESS1,
+        amount: 10_000_000_000n,
         from: ADDRESS1,
+        to: L1_ADDRESS1,
       });
       expect(result).to.be.deep.equal(tx);
     });
@@ -362,9 +363,9 @@ describe('Provider', () => {
     it('should return an BTC withdraw transaction with paymaster parameters', async () => {
       const tx = {
         from: ADDRESS1,
-        value: 7_000_000_000n,
+        value: 10_000_000_000n,
         to: utils.L2_BASE_TOKEN_ADDRESS,
-        data: '0x51cff8d900000000000000000000000036615cf349d7f6344891b1e7ca7c72883f5dc049',
+        data: '0x0968f2640000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c62637274317178326c6b30756e756b6d3830716d65706a703439687766397a36786e7a307337336b396a35360000000000000000000000000000000000000000',
         type: 113,
         customData: {
           paymasterParams: {
@@ -375,9 +376,9 @@ describe('Provider', () => {
         },
       };
       const result = await provider.getWithdrawTx({
-        amount: 7_000_000_000n,
-        to: ADDRESS1,
+        amount: 10_000_000_000n,
         from: ADDRESS1,
+        to: L1_ADDRESS1,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',
           token: APPROVAL_TOKEN,
@@ -484,18 +485,18 @@ describe('Provider', () => {
   describe('#estimateGasWithdraw()', () => {
     it('should return a gas estimation of the withdraw transaction', async () => {
       const result = await provider.estimateGasWithdraw({
-        amount: 7_000_000_000n,
-        to: ADDRESS1,
+        amount: 10_000_000_000n,
         from: ADDRESS1,
+        to: L1_ADDRESS1,
       });
       expect(result > 0n).to.be.true;
     });
 
     it('should return a gas estimation of the withdraw transaction with paymaster', async () => {
       const result = await provider.estimateGasWithdraw({
-        amount: 7_000_000_000n,
-        to: ADDRESS1,
+        amount: 10_000_000_000n,
         from: ADDRESS1,
+        to: L1_ADDRESS1,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',
           token: APPROVAL_TOKEN,
