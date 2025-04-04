@@ -18,24 +18,13 @@ import {
 import {
   Address,
   BalancesMap,
-  FinalizeWithdrawalParams,
-  FullDepositFee,
   PaymasterParams,
-  PriorityOpResponse,
   Signature,
   TransactionLike,
   TransactionRequest,
   TransactionResponse,
 } from './types';
-import {AdapterL1, AdapterL2} from './adapters';
-import {
-  IBridgehub,
-  IL1ERC20Bridge,
-  IL1SharedBridge,
-  IL2Bridge,
-  IL2SharedBridge,
-  IZkSyncHyperchain,
-} from './typechain';
+import {AdapterL2} from './adapters';
 
 /**
  * All typed data conforming to the EIP712 standard within ZKsync Era.

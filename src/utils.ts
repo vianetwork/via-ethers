@@ -18,11 +18,8 @@ import IZkSyncABI from '../abi/IZkSyncHyperchain.json';
 import IBridgehubABI from '../abi/IBridgehub.json';
 import IContractDeployerABI from '../abi/IContractDeployer.json';
 import Contract2FactoryABI from '../abi/Contract2Factory.json';
-import IL1MessengerABI from '../abi/IL1Messenger.json';
 import IERC20ABI from '../abi/IERC20.json';
 import IERC1271ABI from '../abi/IERC1271.json';
-import IL1BridgeABI from '../abi/IL1ERC20Bridge.json';
-import IL2BridgeABI from '../abi/IL2Bridge.json';
 import INonceHolderABI from '../abi/INonceHolder.json';
 import {BTC_NETWORK} from '@scure/btc-signer/src/utils';
 
@@ -55,12 +52,6 @@ export const CONTRACT_DEPLOYER = new ethers.Interface(IContractDeployerABI);
 export const CONTRACT_2_FACTORY = new ethers.Interface(Contract2FactoryABI);
 
 /**
- * The ABI for the `IL1Messenger` interface, which is utilized for sending messages from the L2 to L1.
- * @readonly
- */
-export const L1_MESSENGER = new ethers.Interface(IL1MessengerABI);
-
-/**
  * The ABI for the `IERC20` interface, which is utilized for interacting with ERC20 tokens.
  * @readonly
  */
@@ -71,18 +62,6 @@ export const IERC20 = new ethers.Interface(IERC20ABI);
  * @readonly
  */
 export const IERC1271 = new ethers.Interface(IERC1271ABI);
-
-/**
- * The ABI for the `IL1Bridge` interface, which is utilized for transferring ERC20 tokens from L1 to L2.
- * @readonly
- */
-export const L1_BRIDGE_ABI = new ethers.Interface(IL1BridgeABI);
-
-/**
- * The ABI for the `IL2Bridge` interface, which is utilized for transferring ERC20 tokens from L2 to L1.
- * @readonly
- */
-export const L2_BRIDGE_ABI = new ethers.Interface(IL2BridgeABI);
 
 /**
  * The ABI for the `INonceHolder` interface, which is utilized for managing deployment nonces.
