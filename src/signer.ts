@@ -371,30 +371,6 @@ export class Signer extends AdapterL2 implements ethers.Signer {
   /**
    * @inheritDoc
    *
-   * @example
-   *
-   * import { BrowserProvider, Provider, types } from 'via-ethers';
-   *
-   * const browserProvider = new BrowserProvider(window.ethereum);
-   * const signer = Signer.from(
-   *     await browserProvider.getSigner(),
-   *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
-   * );
-   *
-   * const l2BridgeContracts = await signer.getL2BridgeContracts();
-   */
-  override async getL2BridgeContracts(): Promise<{
-    erc20: IL2Bridge;
-    weth: IL2Bridge;
-    shared: IL2SharedBridge;
-  }> {
-    return super.getL2BridgeContracts();
-  }
-
-  /**
-   * @inheritDoc
-   *
    * @example Withdraw BTC.
    *
    * import { BrowserProvider, Provider, types, utils } from 'via-ethers';

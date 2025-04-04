@@ -1,117 +1,131 @@
 import {
   BigNumberish,
   BlockTag,
-  BytesLike,
   ethers,
-  FetchUrlFeeDataNetworkPlugin,
 } from 'ethers';
 import {Provider} from './provider';
-import {DEFAULT_GAS_PER_PUBDATA_LIMIT, NONCE_HOLDER_ADDRESS} from './utils';
 import {
-  IL2Bridge,
-  IL2Bridge__factory,
+  DEFAULT_GAS_PER_PUBDATA_LIMIT,
+  L1_BRIDGE_ADDRESS,
+  NONCE_HOLDER_ADDRESS,
+} from './utils';
+import {
   INonceHolder__factory,
-  IL2SharedBridge__factory,
-  IL2SharedBridge,
 } from './typechain';
 import {
   Address,
   BalancesMap,
   Eip712Meta,
   PaymasterParams,
-  PriorityOpResponse,
   TransactionRequest,
   TransactionResponse,
+  UnspentTransactionOutput,
 } from './types';
+import BitcoinClient from 'bitcoin-core';
+import * as btc from '@scure/btc-signer';
+import {secp256k1} from '@noble/curves/secp256k1';
+import {hex} from '@scure/base';
+import {SelectionStrategy} from '@scure/btc-signer/utxo';
+import {BTC_NETWORK} from '@scure/btc-signer/utils';
+import {P2Ret, P2TROut} from "@scure/btc-signer/payment";
 
 export abstract class AdapterL1 {
-  protected _providerL1?: ethers.Provider;
-  protected _providerL2!: Provider;
+  /** The private key of the L1 account in WIF format. */
+  protected _signingKey!: string;
+  /** The address of the L1 account. Supported types: `tr`, `sh`, `wpkh`, `pkh`. */
+  protected _address!: string;
+  /** The L1 network configuration. */
+  protected _network!: BTC_NETWORK;
+  /** The provider instance for connecting to a L1 network. */
+  protected _providerL1?: BitcoinClient;
+  /** The provider instance for connecting to a L2 network. */
+  protected _providerL2?: Provider;
+
 
   /**
    * Transfers the specified token from the associated account on the L1 network to the target account on the L2 network.
-   * The token can be either ETH or any ERC20 token. For ERC20 tokens, enough approved tokens must be associated with
-   * the specified L1 bridge (default one or the one defined in `transaction.bridgeAddress`).
-   * In this case, depending on is the chain ETH-based or not `transaction.approveERC20` or `transaction.approveBaseERC20`
-   * can be enabled to perform token approval. If there are already enough approved tokens for the L1 bridge,
-   * token approval will be skipped. To check the amount of approved tokens for a specific bridge,
-   * use the {@link getAllowanceL1} method.
    *
-   * @param transaction The transaction object containing deposit details.
-   * @param transaction.token The address of the token to deposit.
-   * @param transaction.amount The amount of the token to deposit.
-   * @param [transaction.to] The address that will receive the deposited tokens on L2.
-   * @param [transaction.operatorTip] (currently not used) If the ETH value passed with the transaction is not
-   * explicitly stated in the overrides, this field will be equal to the tip the operator will receive on top of
-   * the base cost of the transaction.
-   * @param [transaction.bridgeAddress] The address of the bridge contract to be used.
-   * Defaults to the default ZKsync Era bridge (either `L1EthBridge` or `L1Erc20Bridge`).
-   * @param [transaction.approveERC20] Whether or not token approval should be performed under the hood.
-   * Set this flag to true if you bridge an ERC20 token and didn't call the {@link approveERC20} function beforehand.
-   * @param [transaction.approveBaseERC20] Whether or not base token approval should be performed under the hood.
-   * Set this flag to true if you bridge a base token and didn't call the {@link approveERC20} function beforehand.
-   * @param [transaction.l2GasLimit] Maximum amount of L2 gas that the transaction can consume during execution on L2.
-   * @param [transaction.gasPerPubdataByte] The L2 gas price for each published L1 calldata byte.
-   * @param [transaction.refundRecipient] The address on L2 that will receive the refund for the transaction.
-   * If the transaction fails, it will also be the address to receive `l2Value`.
-   * @param [transaction.overrides] Transaction's overrides for deposit which may be used to pass
-   * L1 `gasLimit`, `gasPrice`, `value`, etc.
-   * @param [transaction.approveOverrides] Transaction's overrides for approval of an ERC20 token which may be used
-   * to pass L1 `gasLimit`, `gasPrice`, `value`, etc.
-   * @param [transaction.approveBaseOverrides] Transaction's overrides for approval of a base token which may be used
-   * to pass L1 `gasLimit`, `gasPrice`, `value`, etc.
-   * @param [transaction.customBridgeData] Additional data that can be sent to a bridge.
+   * @param amount The amount of the token to deposit.
+   * @param to The address that will receive the deposited tokens on L2.
+   * @param strategy The UTXO selection strategy. For more details visit
+   * [this link](https://github.com/paulmillr/scure-btc-signer/tree/1.7.0?tab=readme-ov-file#utxo-selection).
    */
-  async deposit(transaction: {
-    token: Address;
-    amount: BigNumberish;
-    to?: Address;
-    operatorTip?: BigNumberish;
-    bridgeAddress?: Address;
-    approveERC20?: boolean;
-    approveBaseERC20?: boolean;
-    l2GasLimit?: BigNumberish;
-    gasPerPubdataByte?: BigNumberish;
-    refundRecipient?: Address;
-    overrides?: ethers.Overrides;
-    approveOverrides?: ethers.Overrides;
-    approveBaseOverrides?: ethers.Overrides;
-    customBridgeData?: BytesLike;
-  }): Promise<PriorityOpResponse> {
-    return {} as any;
-  }
+  async deposit(
+    to: Address,
+    amount: BigNumberish,
+    strategy: SelectionStrategy = 'default'
+  ): Promise<string> {
+    if (!this._providerL1) throw new Error('Provider is not initialized');
 
-  /**
-   * Returns the base cost for an L2 transaction.
-   *
-   * @param params The parameters for calculating the base cost.
-   * @param params.gasLimit The gasLimit for the L2 contract call.
-   * @param [params.gasPerPubdataByte] The L2 gas price for each published L1 calldata byte.
-   * @param [params.gasPrice] The L1 gas price of the L1 transaction that will send the request for an execute call.
-   */
-  async getBaseCost(params: {
-    gasLimit: BigNumberish;
-    gasPerPubdataByte?: BigNumberish;
-    gasPrice?: BigNumberish;
-  }): Promise<bigint> {
-    return 0n;
-  }
+    const privateKey = btc.WIF(this._network).decode(this._signingKey);
+    const publicKey = secp256k1.getPublicKey(privateKey, true);
+    const addressType = btc.Address(this._network).decode(this._address).type;
 
-  /**
-   * Withdraws funds from the initiated deposit, which failed when finalizing on L2.
-   * If the deposit L2 transaction has failed, it sends an L1 transaction calling `claimFailedDeposit` method of the
-   * L1 bridge, which results in returning L1 tokens back to the depositor.
-   *
-   * @param depositHash The L2 transaction hash of the failed deposit.
-   * @param [overrides] Transaction's overrides which may be used to pass L1 `gasLimit`, `gasPrice`, `value`, etc.
-   * @returns A promise that resolves to the response of the `claimFailedDeposit` transaction.
-   * @throws {Error} If attempting to claim successful deposit.
-   */
-  async claimFailedDeposit(
-    depositHash: BytesLike,
-    overrides?: ethers.Overrides
-  ): Promise<null> {
-    return null;
+    let spend: P2Ret | P2TROut;
+    switch (addressType) {
+      case 'wpkh': // Native SegWit (P2WPKH)
+        spend = btc.p2wpkh(publicKey, this._network);
+        break;
+      case 'tr': // Taproot (P2TR)
+        spend = btc.p2tr(publicKey, undefined, this._network);
+        break;
+      case 'pkh': // Legacy (P2PKH)
+        spend = btc.p2pkh(publicKey, this._network);
+        break;
+      case 'sh': // Nested SegWit (P2SH-P2WPKH)
+        const wpkh = btc.p2wpkh(publicKey, this._network);
+        spend = btc.p2sh(wpkh, this._network);
+        break;
+      default:
+        throw new Error(`Unsupported address type: ${addressType}`);
+    }
+
+    const utxos: UnspentTransactionOutput[] = await this._providerL1.command(
+      'listunspent',
+      1,
+      null,
+      [this._address]
+    );
+
+    const inputs = utxos.map(utxo => ({
+      ...spend,
+      txid: hex.decode(utxo.txid),
+      index: utxo.vout,
+      witnessUtxo: {
+        script: spend.script,
+        amount: btc.Decimal.decode(String(utxo.amount)),
+      },
+    }));
+
+    const outputs = [
+      {
+        address: L1_BRIDGE_ADDRESS,
+        amount: BigInt(amount),
+      },
+      {
+        script: btc.Script.encode(['RETURN', hex.decode(to.slice(2))]),
+        amount: 0n,
+      },
+    ];
+
+    const selected = btc.selectUTXO(inputs, outputs, strategy, {
+      changeAddress: this._address, // required, address to send change
+      // TODO: check the gas from the server
+      feePerByte: 2n,
+      bip69: true,
+      createTx: true,
+      network: this._network,
+      allowUnknownOutputs: true, // required for OP_RETURN
+    });
+
+    if (!selected || !selected.tx)
+      throw new Error('UTXO selection strategy failed');
+    const {tx} = selected;
+    tx.sign(privateKey);
+    tx.finalize();
+
+    const rawTx = hex.encode(tx.extract());
+    return await this._providerL1.command('sendrawtransaction', rawTx);
   }
 }
 
@@ -172,29 +186,6 @@ export abstract class AdapterL2 {
   }
 
   /**
-   * Returns L2 bridge contracts.
-   */
-  async getL2BridgeContracts(): Promise<{
-    erc20: IL2Bridge;
-    weth: IL2Bridge;
-    shared: IL2SharedBridge;
-  }> {
-    if (!this._providerL2) throw new Error('Provider is not initialized');
-    const addresses = await this._providerL2.getDefaultBridgeAddresses();
-    return {
-      erc20: IL2Bridge__factory.connect(addresses.erc20L2, this._signerL2),
-      weth: IL2Bridge__factory.connect(
-        addresses.wethL2 || addresses.erc20L2,
-        this._signerL2
-      ),
-      shared: IL2SharedBridge__factory.connect(
-        addresses.sharedL2,
-        this._signerL2
-      ),
-    };
-  }
-
-  /**
    * Initiates the withdrawal process which withdraws BTC from the
    * associated account on L2 network to the target account on L1 network.
    *
@@ -216,7 +207,7 @@ export abstract class AdapterL2 {
       from: await this.getAddress(),
       ...transaction,
     });
-    return (await this.sendTransaction(withdrawTx)) as TransactionResponse;
+    return await this.sendTransaction(withdrawTx);
   }
 
   /**
@@ -242,7 +233,7 @@ export abstract class AdapterL2 {
       from: await this.getAddress(),
       ...transaction,
     });
-    return (await this.sendTransaction(transferTx)) as TransactionResponse;
+    return await this.sendTransaction(transferTx);
   }
 
   protected _fillCustomData(data: Eip712Meta): Eip712Meta {
@@ -251,49 +242,4 @@ export abstract class AdapterL2 {
     customData.factoryDeps ??= [];
     return customData;
   }
-}
-
-// This method checks if the overrides contain a gasPrice (or maxFeePerGas),
-// if not it will insert the maxFeePerGas
-async function insertGasPrice(
-  l1Provider: ethers.Provider,
-  overrides: ethers.Overrides
-): Promise<void> {
-  if (!overrides.gasPrice && !overrides.maxFeePerGas) {
-    const l1FeeData = await l1Provider.getFeeData();
-
-    // check if plugin is used to fetch fee data
-    const network = await l1Provider.getNetwork();
-    const plugin = <FetchUrlFeeDataNetworkPlugin>(
-      network.getPlugin('org.ethers.plugins.network.FetchUrlFeeDataPlugin')
-    );
-    if (plugin) {
-      overrides.gasPrice = l1FeeData.gasPrice;
-      overrides.maxFeePerGas = l1FeeData.maxFeePerGas;
-      overrides.maxPriorityFeePerGas = l1FeeData.maxPriorityFeePerGas;
-      return;
-    }
-
-    // Sometimes baseFeePerGas is not available, so we use gasPrice instead.
-    const baseFee = l1FeeData.maxFeePerGas
-      ? getBaseCostFromFeeData(l1FeeData)
-      : l1FeeData.gasPrice;
-    if (!baseFee) {
-      throw new Error('Failed to calculate base fee!');
-    }
-
-    // ethers.js by default uses multiplication by 2, but since the price for the L2 part
-    // will depend on the L1 part, doubling base fee is typically too much.
-    overrides.maxFeePerGas =
-      (baseFee * 3n) / 2n + (l1FeeData.maxPriorityFeePerGas ?? 0n);
-    overrides.maxPriorityFeePerGas = l1FeeData.maxPriorityFeePerGas;
-  }
-}
-
-function getBaseCostFromFeeData(feeData: ethers.FeeData): bigint {
-  const maxFeePerGas = feeData.maxFeePerGas!;
-  const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas!;
-
-  // Reverse the logic implemented in the abstract-provider.ts (line 917)
-  return (maxFeePerGas - maxPriorityFeePerGas) / 2n;
 }

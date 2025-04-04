@@ -17,7 +17,6 @@ import {
   APPROVAL_TOKEN,
   PAYMASTER,
   L2_CHAIN_URL,
-  L1_CHAIN_URL,
   DAI,
   L1_ADDRESS1,
 } from '../utils';

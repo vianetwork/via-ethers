@@ -3,15 +3,10 @@ import {ethers, Typed} from 'ethers';
 
 import Token from './files/Token.json';
 import Paymaster from './files/Paymaster.json';
-import {L1_CHAIN_URL, L2_CHAIN_URL} from './utils';
-
-const PRIVATE_KEY =
-  '0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110';
+import {L2_CHAIN_URL, PRIVATE_KEY1} from './utils';
 
 const provider = new Provider(L2_CHAIN_URL);
-const ethProvider = ethers.getDefaultProvider(L1_CHAIN_URL);
-
-const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
+const wallet = new Wallet(PRIVATE_KEY1, provider);
 
 const SALT =
   '0x293328ad84b118194c65a0dc0defdb6483740d3163fd99b260907e15f2e2f642';

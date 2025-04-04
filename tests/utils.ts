@@ -10,5 +10,10 @@ export const DAI = '0x0c796DE773e91c59B610CBd81E721286bBd69511';
 export const APPROVAL_TOKEN = '0x2dc3685cA34163952CF4A5395b0039c00DFa851D'; // Crown token
 export const PAYMASTER = '0x0EEc6f45108B4b806e27B81d9002e162BD910670'; // Crown token paymaster
 export const L1_ADDRESS1 = 'bcrt1qx2lk0unukm80qmepjp49hwf9z6xnz0s73k9j56';
+export const L1_PRIVATE_KEY1 =
+  'cVZduZu265sWeAqFYygoDEE1FZ7wV9rpW5qdqjRkUehjaUMWLT1R';
 export const L2_CHAIN_URL = process.env.L2_CHAIN_URL ?? 'http://127.0.0.1:3050';
-export const L1_CHAIN_URL = 'http://127.0.0.1:15045';
+export const L1_CHAIN_URL = 'http://127.0.0.1:18443';
+export const L1_CHAIN_USER = 'rpcuser';
+export const L1_CHAIN_PASSWORD = 'rpcpassword';
+export const L1_CHAIN_WALLET = 'Watcher';
