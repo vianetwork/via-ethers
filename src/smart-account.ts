@@ -451,7 +451,6 @@ export class SmartAccount extends AbstractSigner {
    * );
    *
    * const withdrawTx = await account.withdraw({
-   *   token: utils.ETH_ADDRESS,
    *   amount: 10_000_000n,
    * });
    *
@@ -472,7 +471,6 @@ export class SmartAccount extends AbstractSigner {
    * );
    *
    * const withdrawTx = await account.withdraw({
-   *   token: utils.ETH_ADDRESS,
    *   amount: 10_000_000n,
    *   paymasterParams: utils.getPaymasterParams(paymaster, {
    *     type: 'ApprovalBased',
@@ -524,7 +522,7 @@ export class SmartAccount extends AbstractSigner {
    * );
    *
    * const transferTx = await account.transfer({
-   *   token: utils.ETH_ADDRESS,
+   *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   to: Wallet.createRandom().address,
    *   amount: ethers.parseEther('0.01'),
    * });
