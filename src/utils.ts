@@ -24,6 +24,7 @@ import IERC1271ABI from '../abi/IERC1271.json';
 import IL1BridgeABI from '../abi/IL1ERC20Bridge.json';
 import IL2BridgeABI from '../abi/IL2Bridge.json';
 import INonceHolderABI from '../abi/INonceHolder.json';
+import {BTC_NETWORK} from '@scure/btc-signer/src/utils';
 
 export * from './paymaster-utils';
 export * from './smart-account-utils';
@@ -88,6 +89,20 @@ export const L2_BRIDGE_ABI = new ethers.Interface(IL2BridgeABI);
  * @readonly
  */
 export const NONCE_HOLDER_ABI = new ethers.Interface(INonceHolderABI);
+
+/**
+ * The address of the L1 bridge.
+ * @readonly
+ */
+export const L1_BRIDGE_ADDRESS =
+  'bcrt1p3s7m76wp5seprjy4gdxuxrr8pjgd47q5s8lu9vefxmp0my2p4t9qh6s8kq';
+
+export const REGTEST_NETWORK: BTC_NETWORK = {
+  bech32: 'bcrt',
+  pubKeyHash: 0x6f,
+  scriptHash: 0xc4,
+  wif: 0xef,
+};
 
 /**
  * The address of the L1 `ETH` token.

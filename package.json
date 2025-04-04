@@ -37,7 +37,10 @@
     "typechain",
     "logo.svg"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "@scure/btc-signer": "^1.7.0",
+    "bitcoin-core": "^5.0.0"
+  },
   "devDependencies": {
     "@typechain/ethers-v6": "^0.5.0",
     "@types/chai": "^4.3.9",

@@ -17,11 +17,7 @@ import {
   FetchRequest,
   toUtf8Bytes,
 } from 'ethers';
-import {
-  IBaseToken__factory,
-  IERC20__factory,
-  IEthToken__factory,
-} from './typechain';
+import {IBaseToken__factory, IERC20__factory} from './typechain';
 import {
   Address,
   TransactionResponse,

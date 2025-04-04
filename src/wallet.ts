@@ -19,29 +19,143 @@ import {
   TransactionResponse,
 } from './types';
 import {AdapterL1, AdapterL2} from './adapters';
-import {IL2Bridge, IL2SharedBridge} from './typechain';
+import BitcoinClient from 'bitcoin-core';
+import {SelectionStrategy} from '@scure/btc-signer/utxo';
+import {BTC_NETWORK, NETWORK} from '@scure/btc-signer/utils';
 
+/**
+ * A `WalletL1` provides actions for L1 network.
+ */
 export class WalletL1 extends AdapterL1 {
-  readonly provider: ethers.Provider | null;
+  /** The private key of the L1 account in WIF format. */
+  readonly signingKey: string;
+  /** The address of the associated L1 account. Supported types: `tr`, `sh`, `wpkh`, `pkh`. */
+  readonly address: string;
+  /** The provider instance for connecting to a L1 network. */
+  readonly provider?: BitcoinClient;
+  /** The L1 network configuration. */
+  readonly network: BTC_NETWORK;
 
+  /**
+   * @param privateKey The private key of the L1 account in WIF format.
+   * @param address The address of the associated L1 account. Supported types: `tr`, `sh`, `wpkh`, `pkh`.
+   * @param provider The provider instance for connecting to a L1 network.
+   * @param network The L1 network configuration.
+   *
+   * @example
+   *
+   * import { WalletL1 } from 'via-ethers';
+   * import BitcoinClient from 'bitcoin-core';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS = '<WALLET_ADDRESS: tr|sh|wpkh|pkh>';
+   *
+   * const providerL1 = new BitcoinClient({
+   *     host: 'http://127.0.0.1:18443',
+   *     username: 'rpc-user',
+   *     password: 'rpc-password',
+   *     wallet: 'Personal',
+   * });
+   * const wallet = new Wallet(PRIVATE_KEY, ADDRESS providerL1, utils.REGTEST_NETWORK);
+   */
   constructor(
-    privateKey: string | SigningKey,
-    provider?: ethers.Provider | null
+    privateKey: string,
+    address: string,
+    provider?: BitcoinClient | null,
+    network: BTC_NETWORK = NETWORK
   ) {
     super();
-    this.provider = provider ?? null;
+    this._signingKey = privateKey;
+    this.signingKey = privateKey;
+
+    this._address = address;
+    this.address = address;
+
+    this._network = network;
+    this.network = network;
+
     this._providerL1 = provider ?? undefined;
+    this.provider = provider ?? undefined;
+  }
+
+  /**
+   * @inheritDoc
+   *
+   * @example
+   *
+   * import { WalletL1, Provider, utils } from 'via-ethers';
+   * import BitcoinClient from 'bitcoin-core';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS = '<WALLET_ADDRESS: tr|sh|wpkh|pkh>';
+   *
+   * const provider = new BitcoinClient({
+   *     host: 'http://127.0.0.1:18443',
+   *     username: 'rpc-user',
+   *     password: 'rpc-password',
+   *     wallet: 'Personal',
+   * });
+   * const wallet = new WalletL1(PRIVATE_KEY, ADDRESS, provider, utils.REGTEST_NETWORK);
+   *
+   * const l2Recipient = '<L2_ACCOUNT_ADDRESS>';
+   * const tx = await wallet.deposit(l2Recipient, 70_000_000n);
+   */
+  override async deposit(
+    to: Address,
+    amount: BigNumberish,
+    strategy: SelectionStrategy = 'default'
+  ): Promise<string> {
+    return super.deposit(to, amount, strategy);
+  }
+
+  /**
+   * Connects to the L1 network using `provider` and `network` configuration.
+   *
+   * @param provider The provider instance for connecting to a L1 network.
+   * @param network The L1 network configuration.
+   *
+   * @example
+   *
+   * import { WalletL1, utils } from 'via-ethers';
+   * import BitcoinClient from 'bitcoin-core';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS = '<WALLET_ADDRESS: tr|sh|wpkh|pkh>';
+   *
+   * const provider = new BitcoinClient({
+   *     host: 'http://127.0.0.1:18443',
+   *     username: 'rpc-user',
+   *     password: 'rpc-password',
+   *     wallet: 'Personal',
+   * });
+   *
+   * const unconnectedWallet = new WalletL1(PRIVATE_KEY, ADDRESS, provider);
+   * const wallet = unconnectedWallet.connect(providerL1, utils.REGTEST_NETWORK);
+   */
+  connect(provider: BitcoinClient, network: BTC_NETWORK): WalletL1 {
+    return new WalletL1(
+      this._signingKey,
+      this._address,
+      provider,
+      network
+    );
   }
 }
 
+/**
+ * A `Wallet` is an extension {@link WalletL2} providing actions for L2 network.
+ */
 export class WalletL2 extends AdapterL2 {
-  readonly #eip712Signer?: EIP712Signer;
-  readonly #signingKey: SigningKey;
+  /** The EIP712 signer for signing EIP712 transaction. */
+  protected _eip712Signer?: EIP712Signer;
+  /** The signing key used for signing payloads. */
+  readonly signingKey: SigningKey;
+  /** The provider instance for connecting to a L2 network. */
   readonly provider: Provider | null;
+  /** Returns the address of the associated account. */
   readonly address: string;
 
   /**
-   *
    * @param privateKey The private key of the account.
    * @param [provider] The provider instance for connecting to a L2 network.
    *
@@ -51,7 +165,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new WalletL2(PRIVATE_KEY, provider);
    */
   constructor(privateKey: string | SigningKey, provider?: Provider | null) {
@@ -59,12 +173,12 @@ export class WalletL2 extends AdapterL2 {
     this.provider = provider ?? null;
     this._providerL2 = provider ?? undefined;
     const wallet = new ethers.Wallet(privateKey, provider);
-    this.#signingKey = wallet.signingKey;
+    this.signingKey = wallet.signingKey;
     this._signerL2 = wallet;
     this.address = wallet.address;
     if (this._providerL2) {
       const network = this._providerL2.getNetwork();
-      this.#eip712Signer = new EIP712Signer(
+      this._eip712Signer = new EIP712Signer(
         this._signerL2,
         network.then(n => Number(n.chainId))
       );
@@ -83,7 +197,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * const MNEMONIC = 'stuff slice staff easily soup parent arm payment cotton hammer scatter struggle';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = WalletL2.fromMnemonic(MNEMONIC, provider);
    */
   static fromMnemonic(mnemonic: string, provider?: Provider): WalletL2 {
@@ -129,7 +243,7 @@ export class WalletL2 extends AdapterL2 {
    * import { WalletL2 } from 'via-ethers';
    * import * as fs from 'fs';
    *
-   * const wallet = WalletL2.fromEncryptedJsonSync(fs.readFileSync('tests/files/wallet.json', 'utf8'), 'password');
+   * const wallet = WalletL2.fromEncryptedJsonSync(fs.readFileSync('wallet.json', 'utf8'), 'password');
    */
   static fromEncryptedJsonSync(
     json: string,
@@ -148,7 +262,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * import { WalletL2, Provider } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = WalletL2.createRandom(provider);
    */
   static createRandom(provider?: Provider): WalletL2 {
@@ -168,11 +282,11 @@ export class WalletL2 extends AdapterL2 {
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    * const unconnectedWallet = new Wallet(PRIVATE_KEY);
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = unconnectedWallet.connect(provider);
    */
   connect(provider: Provider | null): WalletL2 {
-    return new WalletL2(this.#signingKey, provider);
+    return new WalletL2(this.signingKey, provider);
   }
 
   /**
@@ -184,19 +298,12 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new WalletL2(PRIVATE_KEY, provider);
    * const address = await wallet.getAddress();
    */
   override async getAddress(): Promise<Address> {
     return await this._signerL2.getAddress();
-  }
-
-  /**
-   * The signing key used for signing payloads.
-   */
-  get signingKey(): SigningKey {
-    return this.#signingKey;
   }
 
   /**
@@ -228,7 +335,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const tx = await wallet.estimateGas({
@@ -254,7 +361,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const tx = await wallet.populateCall({
@@ -279,7 +386,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const tx = await wallet.call({
@@ -305,12 +412,12 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new WalletL2(PRIVATE_KEY, provider);
    *
    * const populatedTx = await wallet.populateTransaction({
    *   type: utils.EIP712_TX_TYPE,
-   *   to: RECEIVER,
+   *   to: WalletL2.createRandom().address,
    *   value: 7_000_000_000n,
    * });
    */
@@ -369,6 +476,165 @@ export class WalletL2 extends AdapterL2 {
     return this._signerL2.populateTransaction(populated);
   }
 
+  /**
+   * @inheritDoc
+   *
+   * @example Withdraw BTC.
+   *
+   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new WalletL2(PRIVATE_KEY, provider);
+   *
+   * const l1Recipient = '<L1_ACCOUNT_ADDRESS>';
+   * const withdrawTx = await wallet.withdraw({
+   *   to: l1Recipient
+   *   amount: 10_000_000n,
+   * });
+   *
+   * @example Withdraw BTC using paymaster to facilitate fee payment with an ERC20 token.
+   *
+   * import { Wallet, Provider, types, utils } from 'via-ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
+   * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
+   *
+   * const l1Recipient = '<L1_ACCOUNT_ADDRESS>';
+   * const withdrawTx = await wallet.withdraw({
+   *   to: l1Recipient,
+   *   amount: 10_000_000n,
+   *   paymasterParams: utils.getPaymasterParams(paymaster, {
+   *     type: 'ApprovalBased',
+   *     token: token,
+   *     minimalAllowance: 1,
+   *     innerInput: new Uint8Array(),
+   *   }),
+   * });
+   */
+  override async withdraw(transaction: {
+    amount: BigNumberish;
+    to: Address;
+    paymasterParams?: PaymasterParams;
+    overrides?: Overrides;
+  }): Promise<TransactionResponse> {
+    return super.withdraw(transaction);
+  }
+
+  /**
+   * @inheritDoc
+   *
+   * @example Transfer BTC.
+   *
+   * import { WalletL2, Provider, types } from 'via-ethers';
+   * import { ethers } from 'ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
+   *
+   * const transferTx = await wallet.transfer({
+   *   to: WalletL2.createRandom().address,
+   *   amount: ethers.parseEther('0.01'),
+   * });
+   *
+   * const receipt = await transferTx.wait();
+   *
+   * console.log(`The sum of ${receipt.value} BTC was transferred to ${receipt.to}`);
+   *
+   * @example Transfer BTC using paymaster to facilitate fee payment with an ERC20 token.
+   *
+   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   * import { ethers } from 'ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
+   * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new WalletL2(PRIVATE_KEY, provider);
+   *
+   * const transferTx = await wallet.transfer({
+   *   to: WalletL2.createRandom().address,
+   *   amount: ethers.parseEther('0.01'),
+   *   paymasterParams: utils.getPaymasterParams(paymaster, {
+   *     type: 'ApprovalBased',
+   *     token: token,
+   *     minimalAllowance: 1,
+   *     innerInput: new Uint8Array(),
+   *   }),
+   * });
+   *
+   * const receipt = await transferTx.wait();
+   *
+   * console.log(`The sum of ${receipt.value} BTC was transferred to ${receipt.to}`);
+   *
+   * @example Transfer token.
+   *
+   * import { WalletL2, Provider, types } from 'via-ethers';
+   * import { ethers } from 'ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new WalletL2(PRIVATE_KEY, provider);
+   *
+   * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
+   * const transferTx = await wallet.transfer({
+   *   token: tokenL2,
+   *   to: WalletL2.createRandom().address,
+   *   amount: ethers.parseEther('0.01'),
+   * });
+   *
+   * const receipt = await transferTx.wait();
+   *
+   * console.log(`The sum of ${receipt.value} token was transferred to ${receipt.to}`);
+   *
+   * @example Transfer token using paymaster to facilitate fee payment with an ERC20 token.
+   *
+   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   * import { ethers } from 'ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
+   * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new WalletL2(PRIVATE_KEY, provider);
+   *
+   * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
+   * const transferTx = await wallet.transfer({
+   *   token: tokenL2,
+   *   to: WalletL2.createRandom().address,
+   *   amount: ethers.parseEther('0.01'),
+   *   paymasterParams: utils.getPaymasterParams(paymaster, {
+   *     type: 'ApprovalBased',
+   *     token: token,
+   *     minimalAllowance: 1,
+   *     innerInput: new Uint8Array(),
+   *   }),
+   * });
+   *
+   * const receipt = await transferTx.wait();
+   *
+   * console.log(`The sum of ${receipt.value} token was transferred to ${receipt.to}`);
+   */
+  override async transfer(transaction: {
+    to: Address;
+    amount: BigNumberish;
+    token?: Address;
+    paymasterParams?: PaymasterParams;
+    overrides?: Overrides;
+  }): Promise<TransactionResponse> {
+    return super.transfer(transaction);
+  }
+
   /***
    * Signs the transaction and serializes it to be ready to be broadcast to the network.
    *
@@ -382,7 +648,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const tx = await wallet.signTransaction({
@@ -397,10 +663,10 @@ export class WalletL2 extends AdapterL2 {
       return await this._signerL2.signTransaction(populated);
     }
 
-    if (!this.#eip712Signer)
+    if (!this._eip712Signer)
       throw new Error('EIP712 signer is not initialized');
     populated.customData!.customSignature =
-      await this.#eip712Signer.sign(populated);
+      await this._eip712Signer.sign(populated);
     return serializeEip712(populated);
   }
 
@@ -415,7 +681,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const signedMessage = await account.signMessage('Hello World!');
@@ -437,7 +703,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const signedTypedData = await wallet.signTypedData(
@@ -468,7 +734,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new WalletL2(PRIVATE_KEY, provider);
    *
    * const tx = await wallet.sendTransaction({
@@ -492,37 +758,96 @@ export class WalletL2 extends AdapterL2 {
   }
 }
 
-export class Wallet extends WalletL2 {
-  readonly #walletL1;
-  readonly providerL1: ethers.Provider | null;
+/**
+ * A `Wallet` is a composition of {@link WalletL1} and {@link WalletL2} providing actions across networks.
+ * It facilitates bridging assets between different networks through a unified API.
+ * Methods and properties that interact with the L1 network have an `L1` suffix.
+ */
+export class Wallet {
+  protected _walletL1?: WalletL1;
+  protected _walletL2: WalletL2;
 
   /**
-   *
-   * @param privateKey The private key of the account.
+   * @param privateKeyL2 The private key of the L2 account.
    * @param [providerL2] The provider instance for connecting to a L2 network.
+   * @param [privateKeyL1] The private key of the L1 account in WIF format.
+   * @param [addressL1] The address of the associated L1 account. Supported types: `tr`, `sh`, `wpkh`, `pkh`.
    * @param [providerL1] The provider instance for connecting to a L1 network.
+   * @param [networkL1] The L1 network configuration.
    *
    * @example
    *
-   * import { Wallet, Provider, types } from 'via-ethers';
-   * import { ethers } from 'ethers';
+   * import { Wallet, Provider, types, utils } from 'via-ethers';
+   * import BitcoinClient from 'bitcoin-core';
    *
-   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   * const PRIVATE_KEY_L2 = '<L2_WALLET_PRIVATE_KEY>';
+   * const PRIVATE_KEY_L1 = '<L1_WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS_L1 = '<L1_WALLET_ADDRESS: tr|sh|wpkh|pkh>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
+   * const providerL2 = Provider.getDefaultProvider(types.Network.Localhost);
+   * const providerL1 = new BitcoinClient({
+   *     host: 'http://127.0.0.1:18443',
+   *     username: 'rpc-user',
+   *     password: 'rpc-password',
+   *     wallet: 'Personal',
+   * });
+   * const wallet = new Wallet(PRIVATE_KEY_L2, providerL2, PRIVATE_KEY_L1, ADDRESS_L1, providerL1, utils.REGTEST_NETWORK);
    */
   constructor(
-    privateKey: string | ethers.SigningKey,
+    privateKeyL2: string | ethers.SigningKey,
     providerL2?: Provider | null,
-    providerL1?: ethers.Provider | null
+    privateKeyL1?: string,
+    addressL1?: string,
+    providerL1?: BitcoinClient | null,
+    networkL1?: BTC_NETWORK
   ) {
-    super(privateKey, providerL2);
-    this.providerL1 = providerL1 ?? null;
-    this.#walletL1 = new WalletL1(privateKey, providerL1);
+    this._walletL2 = new WalletL2(privateKeyL2, providerL2);
+    if (privateKeyL1 && addressL1)
+      this._walletL1 = new WalletL1(privateKeyL1, addressL1, providerL1, networkL1); // TODO check if this is undefined would default value work
   }
 
+  /**
+   * The provider instance for connecting to a L2 network.
+   */
+  get provider() {
+    return this._walletL2.provider;
+  }
+
+  /**
+   * The provider instance for connecting to a L1 network.
+   */
+  get providerL1() {
+    return this._walletL1?.provider;
+  }
+
+  /**
+   * The L2 signing key used for signing payloads.
+   */
+  get signingKey(): SigningKey {
+    return this._walletL2.signingKey;
+  }
+
+  /**
+   * The L1 signing key used for signing payloads.
+   */
+  get signingKeyL1() {
+    return this._walletL1?.signingKey;
+  }
+
+  /**
+   * Returns the address of the associated L2 account.
+   */
+  get address() {
+    return this._walletL2.address;
+  }
+
+  /**
+   * Returns the address of the associated L1 account.
+   */
+  get addressL1() {
+    return this._walletL1?.address
+  }
+  
   /**
    * Connects to the L2 network using `provider`.
    *
@@ -537,63 +862,105 @@ export class Wallet extends WalletL2 {
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    * const unconnectedWallet = new Wallet(PRIVATE_KEY);
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = unconnectedWallet.connect(provider);
    */
-  override connect(provider: Provider): Wallet {
-    return new Wallet(this.signingKey, provider, this.#walletL1.provider);
+  connect(provider: Provider): Wallet {
+    return new Wallet(
+      this._walletL2.signingKey,
+      provider,
+      this._walletL1?.signingKey,
+      this._walletL1?.address,
+      this._walletL1?.provider,
+      this._walletL1?.network
+    );
   }
 
   /**
-   * Connects to the L1 network using `provider`.
+   * Connects to the L1 network using `provider` and `network` configuration.
    *
    * @param provider The provider instance for connecting to a L1 network.
+   * @param network The L1 network configuration.
    *
    * @see {@link connect} in order to connect to L2 network.
-   *
+   * 
    * @example
    *
-   * import { Wallet } from 'via-ethers';
-   * import { ethers } from 'ethers';
+   * import { Wallet, Provider, types, utils } from 'via-ethers';
+   * import BitcoinClient from 'bitcoin-core';
    *
-   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
-   * const unconnectedWallet = new Wallet(PRIVATE_KEY);
+   * const PRIVATE_KEY_L2 = '<L2_WALLET_PRIVATE_KEY>';
+   * const PRIVATE_KEY_L1 = '<L1_WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS_L1 = '<L1_WALLET_ADDRESS: tr|sh|wpkh|pkh>';
    *
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = unconnectedWallet.connectToL1(ethProvider);
+   * const providerL2 = Provider.getDefaultProvider(types.Network.Localhost);
+   * const providerL1 = new BitcoinClient({
+   *     host: 'http://127.0.0.1:18443',
+   *     username: 'rpc-user',
+   *     password: 'rpc-password',
+   *     wallet: 'Personal',
+   * });
+   * 
+   * const unconnectedWallet = new Wallet(PRIVATE_KEY_L2, providerL2, PRIVATE_KEY_L1, ADDRESS_L1);
+   * const wallet = unconnectedWallet.connectToL1(providerL1, utils.REGTEST_NETWORK);
    */
-  connectToL1(provider: ethers.Provider): Wallet {
-    return new Wallet(this.signingKey, this.provider, provider);
+  connectToL1(provider: BitcoinClient, network: BTC_NETWORK): Wallet {
+    return new Wallet(
+      this._walletL2.signingKey,
+      this._walletL2.provider,
+      this._walletL1?.signingKey,
+      this._walletL1?.address,
+      provider,
+      network
+    );
   }
 
   /**
-   * Creates a new `Wallet` with the L2 and L1 providers and a private key that is built from the mnemonic passphrase.
+   * Creates a new `Wallet` with the L2 and L1 providers, L1 private key and
+   * a private key that is built from the mnemonic passphrase.
    *
-   * @param mnemonic The mnemonic of the private key.
+   * @param mnemonic The mnemonic of the L2 private key.
    * @param [providerL2] The provider instance for connecting to a L2 network.
+   * @param [privateKeyL1] The private key of the L1 account in WIF format.
+   * @param [addressL1] The address of the associated L1 account. Supported types: `tr`, `sh`, `wpkh`, `pkh`.
    * @param [providerL1] The provider instance for connecting to a L1 network.
+   * @param [networkL1] The L1 network configuration.
    *
    * @example
    *
-   * import { Wallet, Provider, types } from 'via-ethers';
-   * import { ethers } from 'ethers';
+   * import { Wallet, Provider, types, utils } from 'via-ethers';
+   * import BitcoinClient from 'bitcoin-core';
    *
    * const MNEMONIC = 'stuff slice staff easily soup parent arm payment cotton hammer scatter struggle';
+   * const PRIVATE_KEY_L1 = '<L1_WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS = '<WALLET_ADDRESS: tr|sh|wpkh|pkh>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = Wallet.fromMnemonic(MNEMONIC, provider, ethProvider);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const providerL2 = Provider.getDefaultProvider(types.Network.Localhost);
+   * const providerL1 = new BitcoinClient({
+   *     host: 'http://127.0.0.1:18443',
+   *     username: 'rpc-user',
+   *     password: 'rpc-password',
+   *     wallet: 'Personal',
+   * });
+   * const wallet = Wallet.fromMnemonic(MNEMONIC, providerL2, PRIVATE_KEY_L1, ADDRESS_L1, providerL2, utils.REGTEST_NETWORK);
    */
-  static override fromMnemonic(
+  static fromMnemonic(
     mnemonic: string,
     providerL2?: Provider,
-    providerL1?: ethers.Provider
+    privateKeyL1?: string,
+    addressL1?: string,
+    providerL1?: BitcoinClient,
+    networkL1?: BTC_NETWORK
   ): Wallet {
-    const wallet = super.fromMnemonic(mnemonic, providerL2);
+    const wallet = WalletL2.fromMnemonic(mnemonic, providerL2);
     return new Wallet(
       wallet.signingKey,
-      wallet.provider ?? undefined,
-      providerL1
+      wallet.provider,
+      privateKeyL1,
+      addressL1,
+      providerL1,
+      networkL1
     );
   }
 
@@ -603,21 +970,34 @@ export class Wallet extends WalletL2 {
    * @param json The encrypted json file.
    * @param password The password for the encrypted json file.
    * @param [callback] If provided, it is called periodically during decryption so that any UI can be updated.
+   * @param [privateKeyL1] The private key of the L1 account in WIF format.
+   * @param [addressL1] The address of the associated L1 account. Supported types: `tr`, `sh`, `wpkh`, `pkh`.
    *
    * @example
    *
    * import { Wallet } from 'via-ethers';
    * import * as fs from 'fs';
    *
-   * const wallet = await Wallet.fromEncryptedJson(fs.readFileSync('wallet.json', 'utf8'), 'password');
+   * const PRIVATE_KEY_L1 = '<L1_WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS_L1 = '<WALLET_ADDRESS: tr|sh|wpkh|pkh>';
+   *
+   * const wallet = await Wallet.fromEncryptedJson(
+   *   fs.readFileSync('wallet.json', 'utf8'),
+   *   'password',
+   *   undefined,
+   *   PRIVATE_KEY_L1,
+   *   ADDRESS_L1
+   * );
    */
-  static override async fromEncryptedJson(
+  static async fromEncryptedJson(
     json: string,
     password: string | Uint8Array,
-    callback?: ProgressCallback
+    callback?: ProgressCallback,
+    privateKeyL1?: string,
+    addressL1?: string
   ): Promise<Wallet> {
-    const wallet = await super.fromEncryptedJson(json, password, callback);
-    return new Wallet(wallet.signingKey);
+    const wallet = await WalletL2.fromEncryptedJson(json, password, callback);
+    return new Wallet(wallet.signingKey, null, privateKeyL1, addressL1);
   }
 
   /**
@@ -625,68 +1005,96 @@ export class Wallet extends WalletL2 {
    *
    * @param json The encrypted json file.
    * @param password The password for the encrypted json file.
+   * @param [privateKeyL1] The private key of the L1 account in WIF format.
+   * @param [addressL1] The address of the associated L1 account. Supported types: `tr`, `sh`, `wpkh`, `pkh`.
    *
    * @example
    *
    * import { Wallet } from 'via-ethers';
    * import * as fs from 'fs';
    *
-   * const wallet = Wallet.fromEncryptedJsonSync(fs.readFileSync('tests/files/wallet.json', 'utf8'), 'password');
+   * const PRIVATE_KEY_L1 = '<L1_WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS_L1 = '<WALLET_ADDRESS: tr|sh|wpkh|pkh>';
+   * 
+   * const wallet = Wallet.fromEncryptedJsonSync(
+   *   fs.readFileSync('wallet.json', 'utf8'), 
+   *   'password',
+   *   PRIVATE_KEY_L1
+   * );
    */
-  static override fromEncryptedJsonSync(
+  static fromEncryptedJsonSync(
     json: string,
-    password: string | Uint8Array
+    password: string | Uint8Array,
+    privateKeyL1?: string,
+    addressL1?: string
   ): Wallet {
-    const wallet = super.fromEncryptedJsonSync(json, password);
-    return new Wallet(wallet.signingKey);
+    const wallet = WalletL2.fromEncryptedJsonSync(json, password);
+    return new Wallet(wallet.signingKey, null, privateKeyL1, addressL1);
   }
 
   /**
-   * Creates a new random `Wallet` with the `provider` as L2 provider.
+   * Creates a new `Wallet` with random L2 account.
    *
+   * @param privateKeyL1 The private key of the L1 account in WIF format.
    * @param [providerL2] The provider instance for connecting to a L2 network.
    * @param [providerL1] The provider instance for connecting to a L1 network.
+   * @param [addressL1] The address of the associated L1 account. Supported types: `tr`, `sh`, `wpkh`, `pkh`.
+   * @param [networkL1] The L1 network configuration.
    *
    * @example
    *
-   * import { Wallet, Provider } from 'via-ethers';
-   * import { ethers } from 'ethers';
+   * import { Wallet, Provider, types, utils } from 'via-ethers';
+   * import BitcoinClient from 'bitcoin-core';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = Wallet.createRandom(provider, ethProvider);
+   * const PRIVATE_KEY_L1 = '<L1_WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS_L1 = '<WALLET_ADDRESS: tr|sh|wpkh|pkh>';
+   *
+   * const providerL2 = Provider.getDefaultProvider(types.Network.Localhost);
+   * const providerL1 = new BitcoinClient({
+   *     host: 'http://127.0.0.1:18443',
+   *     username: 'rpc-user',
+   *     password: 'rpc-password',
+   *     wallet: 'Personal',
+   * });
+   * const wallet = Wallet.createRandom(providerL2, PRIVATE_KEY_L1, providerL1, utils.REGTEST_NETWORK);
    */
-  static override createRandom(
+  static createRandom(
     providerL2?: Provider,
-    providerL1?: ethers.Provider
+    privateKeyL1?: string,
+    addressL1?: string,
+    providerL1?: BitcoinClient,
+    networkL1?: BTC_NETWORK
   ): Wallet {
     const wallet = ethers.Wallet.createRandom();
-    return new Wallet(wallet.privateKey, providerL2, providerL1);
+    return new Wallet(
+      wallet.privateKey,
+      providerL2,
+      privateKeyL1,
+      addressL1,
+      providerL1,
+      networkL1
+    );
   }
 
-  // TODO rename to WalletL1 or btcWallet
   /**
-   * Returns `ethers.Wallet` object with the same private key.
+   * Returns the address of the associated L2 account.
    *
    * @example
    *
-   * import { Wallet, Provider, types, utils } from 'zksync-ethers';
-   * import { ethers } from 'ethers';
+   * import { Wallet, Provider, types } from 'via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
-   *
-   * const ethWallet = wallet.ethWallet();
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
+   * const address = await wallet.getAddress();
    */
-  // ethWallet(): ethers.Wallet {
-  //   return new ethers.Wallet(this.signingKey, this._providerL1());
-  // }
+  async getAddress(): Promise<Address> {
+    return await this._walletL2.getAddress();
+  }
 
   /**
-   * @inheritDoc
+   * Returns the balance of the account.
    *
    * @example Get BTC balance.
    *
@@ -695,7 +1103,7 @@ export class Wallet extends WalletL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const ethProvider = ethers.getDefaultProvider('sepolia');
    * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
    *
@@ -708,7 +1116,7 @@ export class Wallet extends WalletL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const ethProvider = ethers.getDefaultProvider('sepolia');
    * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
    *
@@ -716,15 +1124,15 @@ export class Wallet extends WalletL2 {
    *
    * console.log(`Token balance: ${await wallet.getBalance(token)}`);
    */
-  override async getBalance(
+  async getBalance(
     token?: Address,
     blockTag: BlockTag = 'committed'
   ): Promise<bigint> {
-    return super.getBalance(token, blockTag);
+    return this._walletL2.getBalance(token, blockTag);
   }
 
   /**
-   * @inheritDoc
+   * Returns all token balances of the account.
    *
    * @example
    *
@@ -733,18 +1141,18 @@ export class Wallet extends WalletL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const ethProvider = ethers.getDefaultProvider('sepolia');
    * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
    *
    * const allBalances = await wallet.getAllBalances();
    */
-  override async getAllBalances(): Promise<BalancesMap> {
-    return super.getAllBalances();
+  async getAllBalances(): Promise<BalancesMap> {
+    return this._walletL2.getAllBalances();
   }
 
   /**
-   * @inheritDoc
+   * Returns the deployment nonce of the account.
    *
    * @example
    *
@@ -753,42 +1161,26 @@ export class Wallet extends WalletL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const ethProvider = ethers.getDefaultProvider('sepolia');
    * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
    *
    * console.log(`Nonce: ${await wallet.getDeploymentNonce()}`);
    */
-  override async getDeploymentNonce(): Promise<bigint> {
-    return super.getDeploymentNonce();
+  async getDeploymentNonce(): Promise<bigint> {
+    return this._walletL2.getDeploymentNonce();
   }
 
   /**
-   * @inheritDoc
+   * Initiates the withdrawal process which withdraws BTC from the
+   * associated account on L2 network to the target account on L1 network.
    *
-   * @example
-   *
-   * import { Wallet, Provider, types, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
-   *
-   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
-   *
-   * const l2BridgeContracts = await wallet.getL2BridgeContracts();
-   */
-  override async getL2BridgeContracts(): Promise<{
-    erc20: IL2Bridge;
-    weth: IL2Bridge;
-    shared: IL2SharedBridge;
-  }> {
-    return super.getL2BridgeContracts();
-  }
-
-  /**
-   * @inheritDoc
+   * @param transaction Withdrawal transaction request.
+   * @param transaction.amount The amount of the BTC tokens to withdraw.
+   * @param transaction.to The address of the recipient on L1.
+   * @param [transaction.paymasterParams] Paymaster parameters.
+   * @param [transaction.overrides] Transaction's overrides which may be used to pass L2 `gasLimit`, `gasPrice`, `value`, etc.
+   * @returns A Promise resolving to a withdrawal transaction response.
    *
    * @example Withdraw BTC.
    *
@@ -796,11 +1188,12 @@ export class Wallet extends WalletL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
+   * const l1Recipient = '<L1_ACCOUNT_ADDRESS>';
    * const withdrawTx = await wallet.withdraw({
-   *   token: utils.ETH_ADDRESS,
+   *   to: l1Recipient
    *   amount: 10_000_000n,
    * });
    *
@@ -812,49 +1205,12 @@ export class Wallet extends WalletL2 {
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
+   * const l1Recipient = '<L1_ACCOUNT_ADDRESS>';
    * const withdrawTx = await wallet.withdraw({
-   *   token: utils.ETH_ADDRESS,
-   *   amount: 10_000_000n,
-   *   paymasterParams: utils.getPaymasterParams(paymaster, {
-   *     type: 'ApprovalBased',
-   *     token: token,
-   *     minimalAllowance: 1,
-   *     innerInput: new Uint8Array(),
-   *   }),
-   * });
-   *
-   * @example Withdraw token.
-   *
-   * import { Wallet, Provider, types } from 'via-ethers';
-   *
-   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const wallet = new Wallet(PRIVATE_KEY, provider);
-   *
-   * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
-   * const withdrawTx = await wallet.withdraw({
-   *   token: tokenL2,
-   *   amount: 10_000_000,
-   * });
-   *
-   * @example Withdraw token using paymaster to facilitate fee payment with an ERC20 token.
-   *
-   * import { Wallet, Provider, types, utils } from 'via-ethers';
-   *
-   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
-   * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
-   * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const wallet = new Wallet(PRIVATE_KEY, provider);
-   *
-   * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
-   * const withdrawTx = await wallet.withdraw({
-   *   token: tokenL2,
+   *   to: l1Recipient,
    *   amount: 10_000_000n,
    *   paymasterParams: utils.getPaymasterParams(paymaster, {
    *     type: 'ApprovalBased',
@@ -864,17 +1220,25 @@ export class Wallet extends WalletL2 {
    *   }),
    * });
    */
-  override async withdraw(transaction: {
+  async withdraw(transaction: {
     amount: BigNumberish;
     to: Address;
     paymasterParams?: PaymasterParams;
     overrides?: Overrides;
   }): Promise<TransactionResponse> {
-    return super.withdraw(transaction);
+    return this._walletL2.withdraw(transaction);
   }
 
   /**
-   * @inheritDoc
+   * Transfer BTC or any ERC20 token within the same interface.
+   *
+   * @param transaction Transfer transaction request.
+   * @param transaction.to The address of the recipient.
+   * @param transaction.amount The amount of the token to transfer.
+   * @param [transaction.token] The address of the token. Defaults to BTC.
+   * @param [transaction.paymasterParams] Paymaster parameters.
+   * @param [transaction.overrides] Transaction's overrides which may be used to pass L2 `gasLimit`, `gasPrice`, `value`, etc.
+   * @returns A Promise resolving to a transfer transaction response.
    *
    * @example Transfer BTC.
    *
@@ -883,7 +1247,7 @@ export class Wallet extends WalletL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const transferTx = await wallet.transfer({
@@ -893,18 +1257,18 @@ export class Wallet extends WalletL2 {
    *
    * const receipt = await transferTx.wait();
    *
-   * console.log(`The sum of ${receipt.value} ETH was transferred to ${receipt.to}`);
+   * console.log(`The sum of ${receipt.value} BTC was transferred to ${receipt.to}`);
    *
    * @example Transfer BTC using paymaster to facilitate fee payment with an ERC20 token.
    *
-   * import { Wallet, Provider, types } from 'via-ethers';
+   * import { Wallet, Provider, types, utils } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const transferTx = await wallet.transfer({
@@ -920,7 +1284,7 @@ export class Wallet extends WalletL2 {
    *
    * const receipt = await transferTx.wait();
    *
-   * console.log(`The sum of ${receipt.value} ETH was transferred to ${receipt.to}`);
+   * console.log(`The sum of ${receipt.value} BTC was transferred to ${receipt.to}`);
    *
    * @example Transfer token.
    *
@@ -929,7 +1293,7 @@ export class Wallet extends WalletL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
@@ -945,14 +1309,14 @@ export class Wallet extends WalletL2 {
    *
    * @example Transfer token using paymaster to facilitate fee payment with an ERC20 token.
    *
-   * import { Wallet, Provider, types } from 'via-ethers';
+   * import { Wallet, Provider, types, utils } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
@@ -972,14 +1336,146 @@ export class Wallet extends WalletL2 {
    *
    * console.log(`The sum of ${receipt.value} token was transferred to ${receipt.to}`);
    */
-  override async transfer(transaction: {
+  async transfer(transaction: {
     to: Address;
     amount: BigNumberish;
     token?: Address;
     paymasterParams?: PaymasterParams;
     overrides?: Overrides;
   }): Promise<TransactionResponse> {
-    return super.transfer(transaction);
+    return this._walletL2.transfer(transaction);
+  }
+
+  /**
+   * Transfers the specified token from the associated account on the L1 network to the target account on the L2 network.
+   *
+   * @param amount The amount of the token to deposit.
+   * @param to The address that will receive the deposited tokens on L2.
+   * @param strategy The UTXO selection strategy. For more details visit
+   * [this link](https://github.com/paulmillr/scure-btc-signer/tree/1.7.0?tab=readme-ov-file#utxo-selection).
+   *
+   * @example
+   *
+   * import { Wallet, Provider, types, utils } from 'via-ethers';
+   * import BitcoinClient from 'bitcoin-core';
+   *
+   * const PRIVATE_KEY_L2 = '<L2_WALLET_PRIVATE_KEY>';
+   * const PRIVATE_KEY_L1 = '<L1_WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
+   * const ADDRESS_L1 = '<WALLET_ADDRESS: tr|sh|wpkh|pkh>';
+   *
+   * const providerL2 = Provider.getDefaultProvider(types.Network.Localhost);
+   * const providerL1 = new BitcoinClient({
+   *     host: 'http://127.0.0.1:18443',
+   *     username: 'rpc-user',
+   *     password: 'rpc-password',
+   *     wallet: 'Personal',
+   * });
+   * const wallet = new Wallet(PRIVATE_KEY_L2, providerL2, PRIVATE_KEY_L1, ADDRESS_L1, providerL1, utils.REGTEST_NETWORK);
+   *
+   * const l2Recipient = '<L2_ACCOUNT_ADDRESS>';
+   * const tx = await wallet.deposit(l2Recipient, 70_000_000n);
+   */
+  async deposit(
+    to: Address,
+    amount: BigNumberish,
+    strategy: SelectionStrategy = 'default'
+  ): Promise<string> {
+    if (!this._walletL1)
+      throw new Error('Wallet is not connected to L1 network');
+    return await this._walletL1.deposit(to, amount, strategy);
+  }
+
+  /**
+   * Gets the next nonce required for account to send a transaction.
+   *
+   * @param [blockTag] The block tag for getting the balance on. Latest committed block is the default.
+   */
+  async getNonce(blockTag?: BlockTag | undefined): Promise<number> {
+    return await this._walletL2.getNonce(blockTag);
+  }
+
+  /**
+   * Resolves an ENS Name to an address.
+   *
+   * @param name ENS Name that needs to be resolved.
+   */
+  async resolveName(name: string): Promise<string | null> {
+    return await this._walletL2.resolveName(name);
+  }
+
+  /**
+   * Returns the gas estimation for a transaction.
+   *
+   * @param tx Transaction request that needs to be estimated.
+   *
+   * @example
+   *
+   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
+   *
+   * const tx = await wallet.estimateGas({
+   *   type: utils.EIP712_TX_TYPE,
+   *   to: WalletL2.createRandom().address,
+   *   value: 7_000_000_000n,
+   * });
+   */
+  async estimateGas(tx: TransactionRequest): Promise<bigint> {
+    return await this._walletL2.estimateGas(tx);
+  }
+
+  /**
+   * Prepares a {@link TransactionRequest} for calling:
+   * - Resolves `to` and `from` addresses.
+   * - If from is specified, check that it matches this account.
+   *
+   * @param tx The call to prepare.
+   *
+   * @example
+   *
+   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
+   *
+   * const tx = await wallet.populateCall({
+   *   type: utils.EIP712_TX_TYPE,
+   *   to: WalletL2.createRandom().address,
+   *   value: 7_000_000_000n,
+   * });
+   */
+  async populateCall(tx: TransactionRequest): Promise<TransactionLike> {
+    return await this._walletL2.populateCall(tx);
+  }
+
+  /**
+   * Evaluates the `tx` by running it against the current Blockchain state.
+   * This cannot change state and has no cost, as it is effectively simulating execution.
+   *
+   * @param tx The call to evaluate.
+   *
+   * @example
+   *
+   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
+   *
+   * const tx = await wallet.call({
+   *   type: utils.EIP712_TX_TYPE,
+   *   to: WalletL2.createRandom().address,
+   *   value: 7_000_000_000n,
+   * });
+   */
+  async call(tx: TransactionRequest): Promise<string> {
+    return await this._walletL2.call(tx);
   }
 
   /**
@@ -996,7 +1492,7 @@ export class Wallet extends WalletL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const ethProvider = ethers.getDefaultProvider('sepolia');
    * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
    *
@@ -1006,10 +1502,8 @@ export class Wallet extends WalletL2 {
    *   value: 7_000_000_000n,
    * });
    */
-  override async populateTransaction(
-    tx: TransactionRequest
-  ): Promise<TransactionLike> {
-    return await super.populateTransaction(tx);
+  async populateTransaction(tx: TransactionRequest): Promise<TransactionLike> {
+    return await this._walletL2.populateTransaction(tx);
   }
 
   /***
@@ -1026,7 +1520,7 @@ export class Wallet extends WalletL2 {
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const ethProvider = ethers.getDefaultProvider('sepolia');
    * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
    *
@@ -1036,23 +1530,78 @@ export class Wallet extends WalletL2 {
    *   value: ethers.parseEther('1'),
    * });
    */
-  override async signTransaction(tx: TransactionRequest): Promise<string> {
-    return await super.signTransaction(tx);
+  async signTransaction(tx: TransactionRequest): Promise<string> {
+    return await this._walletL2.signTransaction(tx);
   }
 
   /**
-   * @inheritDoc
+   * Signs an arbitrary message.
+   *
+   * @param message The message that needs to be signed.
+   *
+   * @example
+   *
+   * import { Wallet, Provider, types } from 'via-ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
+   *
+   * const signedMessage = await account.signMessage('Hello World!');
+   */
+  async signMessage(message: string | Uint8Array): Promise<string> {
+    return await this._walletL2.signMessage(message);
+  }
+
+  /**
+   * Signs an EIP-712 typed data.
+   *
+   * @param domain The domain data.
+   * @param types A map of records pointing from field name to field type.
+   * @param value A single record value.
+   *
+   * @example
+   *
+   * import { Wallet, Provider, types } from 'via-ethers';
+   *
+   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
+   *
+   * const signedTypedData = await wallet.signTypedData(
+   *   {name: 'Example', version: '1', chainId: 270},
+   *   {
+   *     Person: [
+   *       {name: 'name', type: 'string'},
+   *       {name: 'age', type: 'uint8'},
+   *     ],
+   *   },
+   *   {name: 'John', age: 30}
+   * );
+   */
+  async signTypedData(
+    domain: ethers.TypedDataDomain,
+    types: Record<string, ethers.TypedDataField[]>,
+    value: Record<string, any>
+  ): Promise<string> {
+    return await this._walletL2.signTypedData(domain, types, value);
+  }
+
+  /**
+   * Broadcast the transaction to the network.
+   *
+   * @param transaction The transaction request that needs to be broadcast to the network.
    *
    * @example
    *
    * import { Wallet, Provider, types, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const tx = await wallet.sendTransaction({
    *   to: Wallet.createRandom().address,
@@ -1065,9 +1614,9 @@ export class Wallet extends WalletL2 {
    * });
    * await tx.wait();
    */
-  override async sendTransaction(
+  async sendTransaction(
     transaction: TransactionRequest
   ): Promise<TransactionResponse> {
-    return await super.sendTransaction(transaction);
+    return await this._walletL2.sendTransaction(transaction);
   }
 }

@@ -1041,3 +1041,43 @@ export interface SmartAccountSigner {
   /** Custom method for populating transaction requests. */
   transactionBuilder?: TransactionBuilder;
 }
+
+/**
+ * Represents an unspent transaction output (UTXO) in the Bitcoin wallet.
+ */
+export interface UnspentTransactionOutput {
+  /** The transaction ID (txid) of the transaction containing this output. */
+  txid: string;
+  /** The output index number (vout) of this output within its transaction. */
+  vout: number;
+  /** The Bitcoin address associated with this output. */
+  address: string;
+  /** The label associated with this address (empty if no label). */
+  label: string;
+  /** The hex-encoded scriptPubKey that controls this output. */
+  scriptPubKey: string;
+  /**
+   * The value of this output in BTC
+   * (return as string if value is too big ot fit into number).
+   */
+  amount: number | string;
+  /**
+   * The number of confirmations this transaction has received
+   * (0 for unconfirmed, 1+ for confirmed).
+   */
+  confirmations: number;
+  /** Whether this output is spendable by this wallet. */
+  spendable: boolean;
+  /**
+   * Whether this output is solvable by this wallet
+   * (can be spent even if we don't have the private keys).
+   */
+  solvable: boolean;
+  /** Array of parent descriptors that can generate this output. */
+  parent_descs: string[];
+  /**
+   * Whether this output is considered safe to spend
+   * (false if it comes from an unconfirmed or untrusted source).
+   */
+  safe: boolean;
+}
