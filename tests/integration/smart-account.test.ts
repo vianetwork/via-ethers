@@ -229,7 +229,7 @@ describe('SmartAccount', async () => {
       const amount = 7_000_000_000n;
       const balanceBeforeTransfer = await provider.getBalance(ADDRESS2);
       const tx = await account.transfer({
-        token: utils.ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         to: ADDRESS2,
         amount: amount,
       });
@@ -256,7 +256,7 @@ describe('SmartAccount', async () => {
       const receiverBalanceBeforeTransfer = await provider.getBalance(ADDRESS2);
 
       const tx = await account.transfer({
-        token: utils.ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         to: ADDRESS2,
         amount: amount,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
@@ -529,7 +529,7 @@ describe('MultisigECDSASmartAccount', async () => {
       const amount = 7_000_000_000n;
       const balanceBeforeTransfer = await provider.getBalance(ADDRESS2);
       const tx = await account.transfer({
-        token: utils.ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         to: ADDRESS2,
         amount: amount,
       });
@@ -556,7 +556,7 @@ describe('MultisigECDSASmartAccount', async () => {
       const receiverBalanceBeforeTransfer = await provider.getBalance(ADDRESS2);
 
       const tx = await account.transfer({
-        token: utils.ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         to: ADDRESS2,
         amount: amount,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {

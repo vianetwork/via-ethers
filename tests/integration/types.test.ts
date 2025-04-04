@@ -13,7 +13,7 @@ describe('types', () => {
     before('setup', async function () {
       this.timeout(25_000);
       tx = await wallet.transfer({
-        token: utils.ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         to: ADDRESS2,
         amount: 1_000_000,
       });
@@ -48,7 +48,7 @@ describe('types', () => {
     before('setup', async function () {
       this.timeout(25_000);
       const tx = await wallet.transfer({
-        token: utils.ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         to: ADDRESS2,
         amount: 1_000_000,
       });
@@ -83,7 +83,7 @@ describe('types', () => {
     before('setup', async function () {
       this.timeout(25_000);
       const tx = await wallet.transfer({
-        token: utils.ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         to: ADDRESS2,
         amount: 1_000_000,
       });
@@ -126,7 +126,7 @@ describe('types', () => {
     before('setup', async function () {
       this.timeout(25_000);
       const tx = await wallet.transfer({
-        token: utils.ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         to: ADDRESS2,
         amount: 1_000_000,
       });

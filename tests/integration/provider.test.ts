@@ -24,7 +24,7 @@ describe('Provider', () => {
   before('setup', async function () {
     this.timeout(25_000);
     const tx = await wallet.transfer({
-      token: utils.LEGACY_ETH_ADDRESS,
+      token: utils.L2_BASE_TOKEN_ADDRESS,
       to: ADDRESS2,
       amount: 1_000_000,
     });
@@ -399,7 +399,7 @@ describe('Provider', () => {
         value: 7_000_000_000n,
       };
       const result = await provider.getTransferTx({
-        token: utils.LEGACY_ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         amount: 7_000_000_000n,
         to: ADDRESS2,
         from: ADDRESS1,
@@ -422,7 +422,7 @@ describe('Provider', () => {
         },
       };
       const result = await provider.getTransferTx({
-        token: utils.LEGACY_ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         amount: 7_000_000_000n,
         to: ADDRESS2,
         from: ADDRESS1,
@@ -511,7 +511,7 @@ describe('Provider', () => {
   describe('#estimateGasTransfer()', () => {
     it('should return a gas estimation of the transfer transaction', async () => {
       const result = await provider.estimateGasTransfer({
-        token: utils.LEGACY_ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         amount: 7_000_000_000,
         to: ADDRESS2,
         from: ADDRESS1,
@@ -521,7 +521,7 @@ describe('Provider', () => {
 
     it('should return a gas estimation of the transfer transaction with paymaster', async () => {
       const result = await provider.estimateGasTransfer({
-        token: utils.LEGACY_ETH_ADDRESS,
+        token: utils.L2_BASE_TOKEN_ADDRESS,
         amount: 7_000_000_000,
         to: ADDRESS2,
         from: ADDRESS1,

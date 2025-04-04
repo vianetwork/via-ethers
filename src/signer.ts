@@ -385,7 +385,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
    * const withdrawTx = await signer.withdraw({
-   *   token: utils.ETH_ADDRESS,
+   *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   amount: 10_000_000n,
    * });
    *
@@ -404,7 +404,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * );
    *
    * const withdrawTx = await signer.withdraw({
-   *   token: utils.ETH_ADDRESS,
+   *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   amount: 10_000_000n,
    *   paymasterParams: utils.getPaymasterParams(paymaster, {
    *     type: 'ApprovalBased',

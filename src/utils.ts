@@ -105,27 +105,6 @@ export const REGTEST_NETWORK: BTC_NETWORK = {
 };
 
 /**
- * The address of the L1 `ETH` token.
- * @readonly
- */
-export const ETH_ADDRESS: Address =
-  '0x0000000000000000000000000000000000000000';
-
-/**
- * The address of the L1 `ETH` token.
- * @readonly
- */
-export const LEGACY_ETH_ADDRESS: Address =
-  '0x0000000000000000000000000000000000000000';
-
-/**
- * In the contracts the zero address can not be used, use one instead
- * @readonly
- */
-export const ETH_ADDRESS_IN_CONTRACTS: Address =
-  '0x0000000000000000000000000000000000000001';
-
-/**
  * The formal address for the `Bootloader`.
  * @readonly
  */
@@ -152,14 +131,6 @@ export const CONTRACT_2_FACTORY_ADDRESS: Address =
  */
 export const L1_MESSENGER_ADDRESS: Address =
   '0x0000000000000000000000000000000000008008';
-
-/**
- * The address of the L2 `ETH` token.
- * @readonly
- * @deprecated In favor of {@link L2_BASE_TOKEN_ADDRESS}.
- */
-export const L2_ETH_TOKEN_ADDRESS: Address =
-  '0x000000000000000000000000000000000000800a';
 
 /**
  * The address of the base token.
@@ -264,26 +235,6 @@ export const DEFAULT_GAS_PER_PUBDATA_LIMIT = 50_000;
  * @readonly
  */
 export const REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT = 800;
-
-/**
- * Returns true if token represents ETH on L1 or L2.
- *
- * @param token The token address.
- *
- * @example
- *
- * import { utils } from 'via-ethers';
- *
- * const isL1ETH = utils.isETH(utils.ETH_ADDRESS); // true
- * const isL2ETH = utils.isETH(utils.ETH_ADDRESS_IN_CONTRACTS); // true
- */
-export function isETH(token: Address) {
-  return (
-    isAddressEq(token, LEGACY_ETH_ADDRESS) ||
-    isAddressEq(token, L2_BASE_TOKEN_ADDRESS) ||
-    isAddressEq(token, ETH_ADDRESS_IN_CONTRACTS)
-  );
-}
 
 /**
  * Pauses execution for a specified number of milliseconds.

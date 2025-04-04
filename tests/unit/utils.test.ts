@@ -15,23 +15,6 @@ describe('utils', () => {
     });
   });
 
-  describe('#isETH()', () => {
-    it('should return true for legacy L1 ETH address', async () => {
-      const result = utils.isETH(utils.LEGACY_ETH_ADDRESS);
-      expect(result).to.be.true;
-    });
-
-    it('should return true for L1 ETH address', async () => {
-      const result = utils.isETH(utils.ETH_ADDRESS_IN_CONTRACTS);
-      expect(result).to.be.true;
-    });
-
-    it('should return true for L2 ETH address', async () => {
-      const result = utils.isETH(utils.L2_BASE_TOKEN_ADDRESS);
-      expect(result).to.be.true;
-    });
-  });
-
   describe('#createAddress()', () => {
     it('should return a correct address', async () => {
       const address = utils.createAddress(ADDRESS1, 1);

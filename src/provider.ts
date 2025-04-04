@@ -51,9 +51,7 @@ import {
   sleep,
   EIP712_TX_TYPE,
   BOOTLOADER_FORMAL_ADDRESS,
-  ETH_ADDRESS_IN_CONTRACTS,
   L2_BASE_TOKEN_ADDRESS,
-  LEGACY_ETH_ADDRESS,
   isAddressEq,
 } from './utils';
 import {Signer} from './signer';
@@ -196,11 +194,7 @@ export function JsonRpcApiProvider<
       blockTag?: BlockTag,
       token?: Address
     ): Promise<bigint> {
-      if (
-        !token ||
-        isAddressEq(token, LEGACY_ETH_ADDRESS) ||
-        isAddressEq(token, ETH_ADDRESS_IN_CONTRACTS)
-      )
+      if (!token || isAddressEq(token, L2_BASE_TOKEN_ADDRESS))
         return await super.getBalance(address, blockTag);
 
       try {
@@ -645,12 +639,7 @@ export function JsonRpcApiProvider<
       overrides?: ethers.Overrides;
     }): Promise<EthersTransactionRequest> {
       const {...tx} = transaction;
-      if (
-        !tx.token ||
-        isAddressEq(tx.token, LEGACY_ETH_ADDRESS) ||
-        isAddressEq(tx.token, ETH_ADDRESS_IN_CONTRACTS)
-      )
-        tx.token = L2_BASE_TOKEN_ADDRESS;
+      if (!tx.token) tx.token = L2_BASE_TOKEN_ADDRESS;
 
       tx.overrides ??= {};
       tx.overrides.from ??= tx.from;
@@ -1077,7 +1066,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * import { Provider, types, utils } from 'via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * console.log(`Logs: ${utils.toJSON(await provider.getLogs({ fromBlock: 0, toBlock: 5, address: utils.L2_ETH_TOKEN_ADDRESS }))}`);
+   * console.log(`Logs: ${utils.toJSON(await provider.getLogs({ fromBlock: 0, toBlock: 5, address: utils.L2_BASE_TOKEN_ADDRESS }))}`);
    */
   override async getLogs(filter: Filter | FilterByBlockHash): Promise<Log[]> {
     return super.getLogs(filter);
@@ -1093,7 +1082,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
    * const account = '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049';
    * const tokenAddress = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
-   * console.log(`ETH balance: ${await provider.getBalance(account)}`);
+   * console.log(`BTC balance: ${await provider.getBalance(account)}`);
    * console.log(`Token balance: ${await provider.getBalance(account, 'latest', tokenAddress)}`);
    */
   override async getBalance(
@@ -1516,21 +1505,20 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
   /**
    * @inheritDoc
    *
-   * @example Retrieve populated ETH withdrawal transactions.
+   * @example Retrieve populated BTC withdrawal transactions.
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
    *
    * const tx = await provider.getWithdrawTx({
-   *   token: utils.ETH_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    * });
    * console.log(`Withdrawal tx: ${tx}`);
    *
-   * @example Retrieve populated ETH withdrawal transaction using paymaster to facilitate fee payment with an ERC20 token.
+   * @example Retrieve populated BTC withdrawal transaction using paymaster to facilitate fee payment with an ERC20 token.
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
@@ -1539,7 +1527,6 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
    * const tx = await provider.getWithdrawTx({
-   *   token: utils.ETH_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
@@ -1571,7 +1558,6 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
    * const gasWithdraw = await provider.estimateGasWithdraw({
-   *   token: utils.ETH_ADDRESS,
    *   amount: 7_000_000,
    *   to: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
@@ -1591,21 +1577,21 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
   /**
    * @inheritDoc
    *
-   * @example Retrieve populated ETH transfer transaction.
+   * @example Retrieve populated BTC transfer transaction.
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
    *
    * const tx = await provider.getTransferTx({
-   *   token: utils.ETH_ADDRESS,
+   *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0xa61464658AfeAf65CccaaFD3a512b69A83B77618',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    * });
    * console.log(`Transfer tx: ${tx}`);
    *
-   * @example Retrieve populated ETH transfer transaction using paymaster to facilitate fee payment with an ERC20 token.
+   * @example Retrieve populated BTC transfer transaction using paymaster to facilitate fee payment with an ERC20 token.
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
@@ -1614,7 +1600,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
    * const tx = await provider.getTransferTx({
-   *   token: utils.ETH_ADDRESS,
+   *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0xa61464658AfeAf65CccaaFD3a512b69A83B77618',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
@@ -1647,7 +1633,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
    * const gasTransfer = await provider.estimateGasTransfer({
-   *   token: utils.ETH_ADDRESS,
+   *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0xa61464658AfeAf65CccaaFD3a512b69A83B77618',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
@@ -1677,7 +1663,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *   `New filter: ${await provider.newFilter({
    *     fromBlock: 0,
    *     toBlock: 5,
-   *     address: utils.L2_ETH_TOKEN_ADDRESS,
+   *     address: utils.L2_BASE_TOKEN_ADDRESS,
    *   })}`
    * );
    */
@@ -1725,7 +1711,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
    * const filter = await provider.newFilter({
-   *   address: utils.L2_ETH_TOKEN_ADDRESS,
+   *   address: utils.L2_BASE_TOKEN_ADDRESS,
    *   topics: [ethers.id('Transfer(address,address,uint256)')],
    * });
    * const result = await provider.getFilterChanges(filter);
@@ -2026,7 +2012,7 @@ export class BrowserProvider extends JsonRpcApiProvider(
    * import { BrowserProvider, utils } from 'via-ethers';
    *
    * const provider = new BrowserProvider(window.ethereum);
-   * console.log(`Logs: ${utils.toJSON(await provider.getLogs({ fromBlock: 0, toBlock: 5, address: utils.L2_ETH_TOKEN_ADDRESS }))}`);
+   * console.log(`Logs: ${utils.toJSON(await provider.getLogs({ fromBlock: 0, toBlock: 5, address: utils.L2_BASE_TOKEN_ADDRESS }))}`);
    */
   override async getLogs(filter: Filter | FilterByBlockHash): Promise<Log[]> {
     return super.getLogs(filter);
@@ -2042,7 +2028,7 @@ export class BrowserProvider extends JsonRpcApiProvider(
    * const provider = new BrowserProvider(window.ethereum);
    * const account = '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049';
    * const tokenAddress = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
-   * console.log(`ETH balance: ${await provider.getBalance(account)}`);
+   * console.log(`BTC balance: ${await provider.getBalance(account)}`);
    * console.log(`Token balance: ${await provider.getBalance(account, 'latest', tokenAddress)}`);
    */
   override async getBalance(
@@ -2451,21 +2437,20 @@ export class BrowserProvider extends JsonRpcApiProvider(
   /**
    * @inheritDoc
    *
-   * @example Retrieve populated ETH withdrawal transactions.
+   * @example Retrieve populated BTC withdrawal transactions.
    *
    * import { BrowserProvider, utils } from 'via-ethers';
    *
    * const provider = new BrowserProvider(window.ethereum);
    *
    * const tx = await provider.getWithdrawTx({
-   *   token: utils.ETH_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    * });
    * console.log(`Withdrawal tx: ${tx}`);
    *
-   * @example Retrieve populated ETH withdrawal transaction using paymaster to facilitate fee payment with an ERC20 token.
+   * @example Retrieve populated BTC withdrawal transaction using paymaster to facilitate fee payment with an ERC20 token.
    *
    * import { BrowserProvider, utils } from 'via-ethers';
    *
@@ -2474,7 +2459,6 @@ export class BrowserProvider extends JsonRpcApiProvider(
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
    * const tx = await provider.getWithdrawTx({
-   *   token: utils.ETH_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
@@ -2506,7 +2490,6 @@ export class BrowserProvider extends JsonRpcApiProvider(
    *
    * const provider = new BrowserProvider(window.ethereum);
    * const gasWithdraw = await provider.estimateGasWithdraw({
-   *   token: utils.ETH_ADDRESS,
    *   amount: 7_000_000,
    *   to: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
@@ -2526,21 +2509,21 @@ export class BrowserProvider extends JsonRpcApiProvider(
   /**
    * @inheritDoc
    *
-   * @example Retrieve populated ETH transfer transaction.
+   * @example Retrieve populated BTC transfer transaction.
    *
    * import { BrowserProvider, utils } from 'via-ethers';
    *
    * const provider = new BrowserProvider(window.ethereum);
    *
    * const tx = await provider.getTransferTx({
-   *   token: utils.ETH_ADDRESS,
+   *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0xa61464658AfeAf65CccaaFD3a512b69A83B77618',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    * });
    * console.log(`Transfer tx: ${tx}`);
    *
-   * @example Retrieve populated ETH transfer transaction using paymaster to facilitate fee payment with an ERC20 token.
+   * @example Retrieve populated BTC transfer transaction using paymaster to facilitate fee payment with an ERC20 token.
    *
    * import { BrowserProvider, utils } from 'via-ethers';
    *
@@ -2549,7 +2532,7 @@ export class BrowserProvider extends JsonRpcApiProvider(
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
    * const tx = await provider.getTransferTx({
-   *   token: utils.ETH_ADDRESS,
+   *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0xa61464658AfeAf65CccaaFD3a512b69A83B77618',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
@@ -2582,7 +2565,7 @@ export class BrowserProvider extends JsonRpcApiProvider(
    *
    * const provider = new BrowserProvider(window.ethereum);
    * const gasTransfer = await provider.estimateGasTransfer({
-   *   token: utils.ETH_ADDRESS,
+   *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   amount: 7_000_000_000,
    *   to: '0xa61464658AfeAf65CccaaFD3a512b69A83B77618',
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
@@ -2612,7 +2595,7 @@ export class BrowserProvider extends JsonRpcApiProvider(
    *   `New filter: ${await provider.newFilter({
    *     fromBlock: 0,
    *     toBlock: 5,
-   *     address: utils.L2_ETH_TOKEN_ADDRESS,
+   *     address: utils.L2_BASE_TOKEN_ADDRESS,
    *   })}`
    * );
    */
@@ -2660,7 +2643,7 @@ export class BrowserProvider extends JsonRpcApiProvider(
    *
    * const provider = new BrowserProvider(window.ethereum);
    * const filter = await provider.newFilter({
-   *   address: utils.L2_ETH_TOKEN_ADDRESS,
+   *   address: utils.L2_BASE_TOKEN_ADDRESS,
    *   topics: [ethers.id('Transfer(address,address,uint256)')],
    * });
    * const result = await provider.getFilterChanges(filter);
