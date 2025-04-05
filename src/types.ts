@@ -27,10 +27,6 @@ export type Signature = string;
 /** Ethereum network. */
 export enum Network {
   Mainnet = 1,
-  Ropsten = 3,
-  Rinkeby = 4,
-  Goerli = 5,
-  Sepolia = 6,
   Localhost = 9,
   EraTestNode = 10,
 }

@@ -1099,26 +1099,22 @@ export class Wallet {
    * @example Get BTC balance.
    *
    * import { Wallet, Provider, types, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * console.log(`ETH balance: ${await wallet.getBalance()}`);
    *
    * @example Get token balance.
    *
    * import { Wallet, Provider, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const token = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
    *
@@ -1137,13 +1133,11 @@ export class Wallet {
    * @example
    *
    * import { Wallet, Provider, types, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const allBalances = await wallet.getAllBalances();
    */
@@ -1157,13 +1151,11 @@ export class Wallet {
    * @example
    *
    * import { Wallet, Provider, types, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * console.log(`Nonce: ${await wallet.getDeploymentNonce()}`);
    */
@@ -1488,13 +1480,11 @@ export class Wallet {
    * @example
    *
    * import { Wallet, Provider, types, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const populatedTx = await wallet.populateTransaction({
    *   type: utils.EIP712_TX_TYPE,
@@ -1516,13 +1506,11 @@ export class Wallet {
    * @example
    *
    * import { Wallet, Provider, types, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
-   * const wallet = new Wallet(PRIVATE_KEY, provider, ethProvider);
+   * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const tx = await wallet.signTransaction({
    *   type: utils.EIP712_TX_TYPE,

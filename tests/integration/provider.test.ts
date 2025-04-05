@@ -8,7 +8,6 @@ import {
   APPROVAL_TOKEN,
   DAI,
   L1_ADDRESS1,
-  L1_CHAIN_URL,
   L2_CHAIN_URL,
   PAYMASTER,
   PRIVATE_KEY1,
@@ -17,7 +16,6 @@ import {
 describe('Provider', () => {
   const provider = new Provider(L2_CHAIN_URL);
   const wallet = new Wallet(PRIVATE_KEY1, provider);
-  const ethProvider = ethers.getDefaultProvider(L1_CHAIN_URL);
 
   let receipt: types.TransactionReceipt;
 
@@ -32,16 +30,10 @@ describe('Provider', () => {
   });
 
   describe('#getDefaultProvider()', () => {
-    it('should return a provider connected to Sepolia network', async () => {
-      const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+    it('should return a provider connected to Localhost network', async () => {
+      const provider = Provider.getDefaultProvider(types.Network.Localhost);
       const network = await provider.getNetwork();
-      expect(network.chainId).to.be.equal(300n);
-    });
-
-    it('should return a provider connected to main network', async () => {
-      const provider = Provider.getDefaultProvider(types.Network.Mainnet);
-      const network = await provider.getNetwork();
-      expect(network.chainId).to.be.equal(324n);
+      expect(network.chainId).to.be.equal(270n);
     });
   });
 

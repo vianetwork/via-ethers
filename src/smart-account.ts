@@ -75,7 +75,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -106,14 +106,14 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const sepoliaProvider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const sepoliaAccount = new SmartAccount(
+   * const LocalhostProvider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const LocalhostAccount = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
-   *   sepoliaProvider
+   *   LocalhostProvider
    * );
    *
    * const mainnetProvider = Provider.getDefaultProvider(types.Network.Mainnet);
-   * const mainnetAccount = sepoliaAccount.connect(mainnetProvider);
+   * const mainnetAccount = LocalhostAccount.connect(mainnetProvider);
    */
   connect(provider: null | Provider): SmartAccount {
     return new SmartAccount(
@@ -137,7 +137,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -162,7 +162,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -191,7 +191,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -216,7 +216,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -245,7 +245,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -286,7 +286,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -326,7 +326,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -358,7 +358,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -385,7 +385,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -444,7 +444,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -464,7 +464,7 @@ export class SmartAccount extends AbstractSigner {
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -515,7 +515,7 @@ export class SmartAccount extends AbstractSigner {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -542,7 +542,7 @@ export class SmartAccount extends AbstractSigner {
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = new SmartAccount(
    *   {address: ADDRESS, secret: PRIVATE_KEY},
    *   provider
@@ -599,7 +599,7 @@ export class ECDSASmartAccount {
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = ECDSASmartAccount.create(ADDRESS, PRIVATE_KEY, provider);
    */
   static create(
@@ -632,7 +632,7 @@ export class MultisigECDSASmartAccount {
    * const PRIVATE_KEY1 = '<PRIVATE_KEY1>';
    * const PRIVATE_KEY2 = '<PRIVATE_KEY2>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    *
    * const account = MultisigECDSASmartAccount.create(
    *   multisigAddress,

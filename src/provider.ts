@@ -1010,7 +1010,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const TX_HASH = '<YOUR_TX_HASH_ADDRESS>';
    * console.log(`Transaction receipt: ${utils.toJSON(await provider.getTransactionReceipt(TX_HASH))}`);
    */
@@ -1027,7 +1027,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    *
    * const TX_HASH = '<YOUR_TX_HASH_ADDRESS>';
    * const tx = await provider.getTransaction(TX_HASH);
@@ -1048,7 +1048,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Block: ${utils.toJSON(await provider.getBlock('latest', true))}`);
    */
   override async getBlock(
@@ -1065,7 +1065,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Logs: ${utils.toJSON(await provider.getLogs({ fromBlock: 0, toBlock: 5, address: utils.L2_BASE_TOKEN_ADDRESS }))}`);
    */
   override async getLogs(filter: Filter | FilterByBlockHash): Promise<Log[]> {
@@ -1079,7 +1079,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049';
    * const tokenAddress = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * console.log(`BTC balance: ${await provider.getBalance(account)}`);
@@ -1100,7 +1100,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Protocol version: ${await provider.getProtocolVersion()}`);
    */
   override async getProtocolVersion(id?: number): Promise<ProtocolVersion> {
@@ -1114,7 +1114,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const gasL1 = await provider.estimateGasL1({
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    *   to: await provider.getMainContractAddress(),
@@ -1138,7 +1138,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const fee = await provider.estimateFee({
    *   from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
    *   to: '0xa61464658AfeAf65CccaaFD3a512b69A83B77618',
@@ -1157,7 +1157,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const feeParams = await provider.getFeeParams();
    * console.log(`Fee: ${utils.toJSON(feeParams)}`);
    */
@@ -1172,7 +1172,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Gas price: ${await provider.getGasPrice()}`);
    */
   override async getGasPrice(): Promise<bigint> {
@@ -1186,7 +1186,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * // Any L2 -> L1 transaction can be used.
    * // In this case, withdrawal transaction is used.
    * const tx = '0x2a1c6c74b184965c0cb015aae9ea134fd96215d2e4f4979cfec12563295f610e';
@@ -1206,7 +1206,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const l1BatchNumber = await provider.getL1BatchNumber();
    * console.log(`L1 batch block range: ${utils.toJSON(await provider.getL1BatchBlockRange(l1BatchNumber))}`);
    */
@@ -1223,7 +1223,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Main contract: ${await provider.getMainContractAddress()}`);
    */
   override async getMainContractAddress(): Promise<Address> {
@@ -1237,7 +1237,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Bridgehub: ${await provider.getBridgehubContractAddress()}`);
    */
   override async getBridgehubContractAddress(): Promise<Address> {
@@ -1251,7 +1251,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Base token: ${await provider.getBaseTokenContractAddress()}`);
    */
   override async getBaseTokenContractAddress(): Promise<Address> {
@@ -1265,7 +1265,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Testnet paymaster: ${await provider.getTestnetPaymasterAddress()}`);
    */
   override async getTestnetPaymasterAddress(): Promise<Address | null> {
@@ -1279,7 +1279,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Default bridges: ${utils.toJSON(await provider.getDefaultBridgeAddresses())}`);
    */
   override async getDefaultBridgeAddresses(): Promise<{
@@ -1300,7 +1300,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const balances = await provider.getAllAccountBalances('0x36615Cf349d7F6344891B1e7CA7C72883F5dc049');
    * console.log(`All balances: ${utils.toJSON(balances)}`);
    */
@@ -1315,7 +1315,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const tokens = await provider.getConfirmedTokens();
    * console.log(`Confirmed tokens: ${utils.toJSON(tokens)}`);
    */
@@ -1330,7 +1330,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types} from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const l1ChainId = await provider.l1ChainId();
    * console.log(`All balances: ${l1ChainId}`);
    */
@@ -1345,7 +1345,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`L1 batch number: ${await provider.getL1BatchNumber()}`);
    */
   override async getL1BatchNumber(): Promise<number> {
@@ -1359,7 +1359,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const l1BatchNumber = await provider.getL1BatchNumber();
    * console.log(`L1 batch details: ${utils.toJSON(await provider.getL1BatchDetails(l1BatchNumber))}`);
    */
@@ -1374,7 +1374,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Block details: ${utils.toJSON(await provider.getBlockDetails(90_000))}`);
    */
   override async getBlockDetails(number: number): Promise<BlockDetails> {
@@ -1388,7 +1388,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    *
    * const TX_HASH = '<YOUR_TX_HASH_ADDRESS>';
    * console.log(`Transaction details: ${utils.toJSON(await provider.getTransactionDetails(TX_HASH))}`);
@@ -1412,7 +1412,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * const testnetPaymasterBytecodeHash = '0x010000f16d2b10ddeb1c32f2c9d222eb1aea0f638ec94a81d4e916c627720e30';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Bytecode: ${await provider.getBytecodeByHash(testnetPaymasterBytecodeHash)}`);
    */
   override async getBytecodeByHash(
@@ -1428,7 +1428,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Raw block transactions: ${utils.toJSON(await provider.getRawBlockTransactions(90_000))}`);
    */
   override async getRawBlockTransactions(
@@ -1444,7 +1444,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const address = '0x082b1BB53fE43810f646dDd71AA2AB201b4C6b04';
    *
    * // Fetching the storage proof for rawNonces storage slot in NonceHolder system contract.
@@ -1484,7 +1484,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = new Wallet(PRIVATE_KEY, provider);
    *
    * const txWithOutputs = await provider.sendRawTransactionWithDetailedOutput(
@@ -1509,7 +1509,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    *
    * const tx = await provider.getWithdrawTx({
    *   amount: 7_000_000_000,
@@ -1522,7 +1522,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
@@ -1556,7 +1556,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const gasWithdraw = await provider.estimateGasWithdraw({
    *   amount: 7_000_000,
    *   to: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049',
@@ -1581,7 +1581,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    *
    * const tx = await provider.getTransferTx({
    *   token: utils.L2_BASE_TOKEN_ADDRESS,
@@ -1595,7 +1595,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
    *
@@ -1631,7 +1631,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const gasTransfer = await provider.estimateGasTransfer({
    *   token: utils.L2_BASE_TOKEN_ADDRESS,
    *   amount: 7_000_000_000,
@@ -1658,7 +1658,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(
    *   `New filter: ${await provider.newFilter({
    *     fromBlock: 0,
@@ -1680,7 +1680,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`New block filter: ${await provider.newBlockFilter()}`);
    */
   override async newBlockFilter(): Promise<bigint> {
@@ -1694,7 +1694,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`New pending transaction filter: ${await provider.newPendingTransactionsFilter()}`);
    */
   override async newPendingTransactionsFilter(): Promise<bigint> {
@@ -1709,7 +1709,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * import { Provider, types, utils } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const filter = await provider.newFilter({
    *   address: utils.L2_BASE_TOKEN_ADDRESS,
    *   topics: [ethers.id('Transfer(address,address,uint256)')],
@@ -1727,7 +1727,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    *
    * const TX_HASH = '<YOUR_TX_HASH_ADDRESS>';
    * console.log(`Transaction status: ${utils.toJSON(await provider.getTransactionStatus(TX_HASH))}`);
@@ -1746,8 +1746,8 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * import { Provider, types, utils } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const ethProvider = ethers.getDefaultProvider('Localhost');
    * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
    * const l1TxResponse = await ethProvider.getTransaction(l1Tx);
    * if (l1TxResponse) {
@@ -1768,8 +1768,8 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * import { Provider, types, utils } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const ethProvider = ethers.getDefaultProvider('Localhost');
    * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
    * const l1TxResponse = await ethProvider.getTransaction(l1Tx);
    * if (l1TxResponse) {
@@ -1789,7 +1789,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * // Any L2 -> L1 transaction can be used.
    * // In this case, withdrawal transaction is used.
    * const tx = '0x2a1c6c74b184965c0cb015aae9ea134fd96215d2e4f4979cfec12563295f610e';
@@ -1814,7 +1814,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types, utils } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const tokenAddress = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * console.log(`Contract account info: ${utils.toJSON(await provider.getContractAccountInfo(tokenAddress))}`);
    */
@@ -1859,7 +1859,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * import { Provider, types } from 'via-ethers';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    */
   static getDefaultProvider(
     zksyncNetwork: ZkSyncNetwork = ZkSyncNetwork.Localhost
@@ -1867,10 +1867,6 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
     switch (zksyncNetwork) {
       case ZkSyncNetwork.Localhost:
         return new Provider('http://127.0.0.1:3050');
-      case ZkSyncNetwork.Sepolia:
-        return new Provider('https://sepolia.era.zksync.dev');
-      case ZkSyncNetwork.Mainnet:
-        return new Provider('https://mainnet.era.zksync.io');
       case ZkSyncNetwork.EraTestNode:
         return new Provider('http://127.0.0.1:8011');
       default:
@@ -2417,7 +2413,7 @@ export class BrowserProvider extends JsonRpcApiProvider(
    * const signer = Signer.from(
    *     await provider.getSigner(),
    *     Number((await provider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const txWithOutputs = await provider.sendRawTransactionWithDetailedOutput(
@@ -2678,7 +2674,7 @@ export class BrowserProvider extends JsonRpcApiProvider(
    * import { BrowserProvider, utils } from 'via-ethers';
    *
    * const provider = new BrowserProvider(window.ethereum);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
+   * const ethProvider = ethers.getDefaultProvider('Localhost');
    * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
    * const l1TxResponse = await ethProvider.getTransaction(l1Tx);
    * if (l1TxResponse) {
@@ -2699,7 +2695,7 @@ export class BrowserProvider extends JsonRpcApiProvider(
    * import { BrowserProvider, utils } from 'via-ethers';
    *
    * const provider = new BrowserProvider(window.ethereum);
-   * const ethProvider = ethers.getDefaultProvider('sepolia');
+   * const ethProvider = ethers.getDefaultProvider('Localhost');
    * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
    * const l1TxResponse = await ethProvider.getTransaction(l1Tx);
    * if (l1TxResponse) {
