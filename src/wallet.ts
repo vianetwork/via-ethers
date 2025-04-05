@@ -803,7 +803,7 @@ export class Wallet {
   ) {
     this._walletL2 = new WalletL2(privateKeyL2, providerL2);
     if (privateKeyL1 && addressL1)
-      this._walletL1 = new WalletL1(privateKeyL1, addressL1, providerL1, networkL1); // TODO check if this is undefined would default value work
+      this._walletL1 = new WalletL1(privateKeyL1, addressL1, providerL1, networkL1);
   }
 
   /**
