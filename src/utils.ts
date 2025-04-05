@@ -163,42 +163,6 @@ export const PRIORITY_OPERATION_L2_TX_TYPE = 0xff;
 export const MAX_BYTECODE_LEN_BYTES: number = ((1 << 16) - 1) * 32;
 
 /**
- * Numerator used in scaling the gas limit to ensure acceptance of `L1->L2` transactions.
- *
- * This constant is part of a coefficient calculation to adjust the gas limit to account for variations
- * in the SDK estimation, ensuring the transaction will be accepted.
- *
- * @readonly
- */
-export const L1_FEE_ESTIMATION_COEF_NUMERATOR = 12;
-
-/**
- * Denominator used in scaling the gas limit to ensure acceptance of `L1->L2` transactions.
- *
- * This constant is part of a coefficient calculation to adjust the gas limit to account for variations
- * in the SDK estimation, ensuring the transaction will be accepted.
- *
- * @readonly
- */
-export const L1_FEE_ESTIMATION_COEF_DENOMINATOR = 10;
-
-/**
- * Gas limit used for displaying the error messages when the
- * users do not have enough fee when depositing ERC20 token from L1 to L2.
- *
- * @readonly
- */
-export const L1_RECOMMENDED_MIN_ERC20_DEPOSIT_GAS_LIMIT = 400_000;
-
-/**
- * Gas limit used for displaying the error messages when the
- * users do not have enough fee when depositing `ETH` token from L1 to L2.
- *
- * @readonly
- */
-export const L1_RECOMMENDED_MIN_ETH_DEPOSIT_GAS_LIMIT = 200_000;
-
-/**
  * Default gas per pubdata byte for L2 transactions.
  * This value is utilized when inserting a default value for type 2
  * and EIP712 type transactions.
@@ -901,62 +865,6 @@ export function getL2HashFromPriorityOp(
   return txHash;
 }
 
-const ADDRESS_MODULO = 2n ** 160n;
-
-/**
- * Converts the address that submitted a transaction to the inbox on L1 to the `msg.sender` viewed on L2.
- * Returns the `msg.sender` of the `L1->L2` transaction as the address of the contract that initiated the transaction.
- *
- * All available cases:
- * - During a normal transaction, if contract `A` calls contract `B`, the `msg.sender` is `A`.
- * - During `L1->L2` communication, if an EOA `X` calls contract `B`, the `msg.sender` is `X`.
- * - During `L1->L2` communication, if a contract `A` calls contract `B`, the `msg.sender` is `applyL1ToL2Alias(A)`.
- *
- * @param address The address of the contract.
- * @returns The transformed address representing the `msg.sender` on L2.
- *
- * @see
- * {@link undoL1ToL2Alias}.
- *
- * @example
- *
- * import { utils } from 'via-ethers';
- *
- * const l1ContractAddress = '0x702942B8205E5dEdCD3374E5f4419843adA76Eeb';
- * const l2ContractAddress = utils.applyL1ToL2Alias(l1ContractAddress);
- * // l2ContractAddress = '0x813A42B8205E5DedCd3374e5f4419843ADa77FFC'
- */
-export function applyL1ToL2Alias(address: string): string {
-  return ethers.toBeHex(
-    (BigInt(address) + BigInt(L1_TO_L2_ALIAS_OFFSET)) % ADDRESS_MODULO,
-    20
-  );
-}
-
-/**
- * Converts and returns the `msg.sender` viewed on L2 to the address that submitted a transaction to the inbox on L1.
- *
- * @param address The sender address viewed on L2.
- *
- * @see
- * {@link applyL1ToL2Alias}.
- *
- * @example
- *
- * import { utils } from 'via-ethers';
- *
- * const l2ContractAddress = '0x813A42B8205E5DedCd3374e5f4419843ADa77FFC';
- * const l1ContractAddress = utils.undoL1ToL2Alias(l2ContractAddress);
- * // const l1ContractAddress = '0x702942B8205E5dEdCD3374E5f4419843adA76Eeb'
- */
-export function undoL1ToL2Alias(address: string): string {
-  let result = BigInt(address) - BigInt(L1_TO_L2_ALIAS_OFFSET);
-  if (result < 0n) {
-    result += ADDRESS_MODULO;
-  }
-  return ethers.toBeHex(result, 20);
-}
-
 /**
  * Validates signatures from non-contract account addresses (EOA).
  * Provides similar functionality to `ethers.js` but returns `true`
@@ -1190,28 +1098,6 @@ export async function isTypedDataSignatureCorrect(
 ): Promise<boolean> {
   const msgHash = ethers.TypedDataEncoder.hash(domain, types, value);
   return await isSignatureCorrect(provider, address, msgHash, signature);
-}
-
-/**
- * Scales the provided gas limit using a coefficient to ensure acceptance of L1->L2 transactions.
- *
- * This function adjusts the gas limit by multiplying it with a coefficient calculated from the
- * `L1_FEE_ESTIMATION_COEF_NUMERATOR` and `L1_FEE_ESTIMATION_COEF_DENOMINATOR` constants.
- *
- * @param gasLimit - The gas limit to be scaled.
- *
- * @example
- *
- * import { utils } from 'via-ethers';
- *
- * const scaledGasLimit = utils.scaleGasLimit(10_000);
- * // scaledGasLimit = 12_000
- */
-export function scaleGasLimit(gasLimit: bigint): bigint {
-  return (
-    (gasLimit * BigInt(L1_FEE_ESTIMATION_COEF_NUMERATOR)) /
-    BigInt(L1_FEE_ESTIMATION_COEF_DENOMINATOR)
-  );
 }
 
 /**
