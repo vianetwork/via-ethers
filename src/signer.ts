@@ -61,7 +61,7 @@ export class EIP712Signer {
    *
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const signer = new EIP712Signer(new ethers.Wallet(PRIVATE_KEY), Number((await provider.getNetwork()).chainId));
    */
   constructor(
@@ -138,7 +138,7 @@ export class EIP712Signer {
    *
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const signer = new EIP712Signer(new ethers.Wallet(PRIVATE_KEY, Number(await provider.getNetwork()));
    * const signature = signer.sign({
    *   type: utils.EIP712_TX_TYPE,
@@ -208,7 +208,7 @@ export class EIP712Signer {
    *
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
    *
-   * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const signer = new EIP712Signer(new ethers.Wallet(PRIVATE_KEY, Number(await provider.getNetwork()));
    * const domain = await signer.getDomain();
    */
@@ -245,7 +245,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    */
   static from(
@@ -274,7 +274,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    * const address = await signer.getAddress();
    */
@@ -293,7 +293,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    * const balance = await signer.getBalance();
    *
@@ -305,7 +305,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const token = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
@@ -329,7 +329,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const allBalances = await signer.getAllBalances();
@@ -349,7 +349,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    * const deploymentNonce = await signer.getDeploymentNonce();
    */
@@ -369,7 +369,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
@@ -389,7 +389,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const withdrawTx = await signer.withdraw({
@@ -424,7 +424,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const transferTx = await signer.transfer({
@@ -448,7 +448,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = await Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const transferTx = signer.transfer({
@@ -475,7 +475,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
@@ -501,7 +501,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = await Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
@@ -542,7 +542,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * const nonce = await signer.getNonce();
@@ -566,7 +566,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const signer = Signer.from(
    *     await browserProvider.getSigner(),
    *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Sepolia)
+   *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
    * signer.sendTransaction({
