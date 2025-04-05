@@ -166,7 +166,7 @@ export const signPayloadWithMultipleECDSA: PayloadSigner = async (
  *
  * const PRIVATE_KEY = '<PRIVATE_KEY>';
  *
- * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+ * const provider = Provider.getDefaultProvider(types.Network.Localhost);
  *
  * const populatedTx = await utils.populateTransactionECDSA(
  *   {
@@ -258,7 +258,7 @@ export const populateTransactionECDSA: TransactionBuilder = async (
  * const PRIVATE_KEY1 = '<PRIVATE_KEY1>';
  * const PRIVATE_KEY2 = '<PRIVATE_KEY2>';
  *
- * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+ * const provider = Provider.getDefaultProvider(types.Network.Localhost);
  *
  * const populatedTx = await utils.populateTransactionMultisigECDSA(
  *   {

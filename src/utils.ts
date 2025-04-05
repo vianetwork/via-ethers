@@ -285,7 +285,7 @@ export function getHashedL2ToL1Msg(
  *
  * import { Provider, types, utils } from 'via-ethers';
  *
- * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+ * const provider = Provider.getDefaultProvider(types.Network.Localhost);
  *
  * const deployTx = '<DEPLOY TRANSACTION>';
  * const receipt = await provider.getTransactionReceipt(deployTx);
@@ -861,8 +861,8 @@ export function eip712TxHash(
  * import { Provider, types, utils } from 'via-ethers';
  * import { ethers } from 'ethers';
  *
- * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
- * const ethProvider = ethers.getDefaultProvider('sepolia');
+ * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+ * const ethProvider = ethers.getDefaultProvider('Localhost');
  * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
  * const l1TxReceipt = await ethProvider.getTransactionReceipt(l1Tx);
  * if (l1TxReceipt) {
@@ -1019,7 +1019,7 @@ function isECDSASignatureCorrect(
  * const ADDRESS = '<MULTISIG ACCOUNT ADDRESS>';
  * const PRIVATE_KEY1 = '<FIRST PRIVATE KEY>;
  * const PRIVATE_KEY2 = '<SECOND PRIVATE KEY>;
- * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+ * const provider = Provider.getDefaultProvider(types.Network.Localhost);
  *
  * const account = MultisigECDSASmartAccount.create(
  *   ADDRESS,
@@ -1069,7 +1069,7 @@ async function isEIP1271SignatureCorrect(
  *
  * const ADDRESS = '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049';
  * const MSG_HASH = '<WALLET_PRIVATE_KEY>';
- * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+ * const provider = Provider.getDefaultProvider(types.Network.Localhost);
  *
  * const isCorrect = await utils.isSignatureCorrect(
  *   provider,
@@ -1116,7 +1116,7 @@ async function isSignatureCorrect(
  *
  * const ADDRESS = '<WALLET_ADDRESS>';
  * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
- * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+ * const provider = Provider.getDefaultProvider(types.Network.Localhost);
  *
  * const message = 'Hello, world!';
  * const signature = await new Wallet(PRIVATE_KEY).signMessage(message);
@@ -1153,7 +1153,7 @@ export async function isMessageSignatureCorrect(
  *
  * const ADDRESS = '<WALLET_ADDRESS>';
  * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
- * const provider = Provider.getDefaultProvider(types.Network.Sepolia);
+ * const provider = Provider.getDefaultProvider(types.Network.Localhost);
  *
  * const tx: types.TransactionRequest = {
  *   type: 113,
