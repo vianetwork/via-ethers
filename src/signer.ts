@@ -220,14 +220,47 @@ export class EIP712Signer {
 /**
  * A `Signer` is designed for frontend use with browser wallet injection (e.g., MetaMask),
  * providing only L2 operations.
- *
- * @see {@link SignerL1} for L1 operations.
  */
 export class Signer extends AdapterL2 implements ethers.Signer {
-  public provider!: Provider;
-  signer!: ethers.JsonRpcSigner;
-  eip712Signer!: EIP712Signer;
-  address!: string;
+  provider: Provider;
+  signer: ethers.JsonRpcSigner;
+  eip712Signer: EIP712Signer;
+  address: string;
+
+  /**
+   * Creates a new Singer with provided `signer` and `chainId`.
+   *
+   * @param signer  The signer from browser wallet.
+   * @param chainId The chain ID of the network.
+   * @param [provider] The provider instance for connecting to a L2 network. If not provided,
+   * the methods from the `zks` namespace are not supported, and interaction with them will result in an error.
+   *
+   * @example
+   *
+   * import { BrowserProvider, Provider, types } from 'via-ethers';
+   *
+   * const browserProvider = new BrowserProvider(window.ethereum);
+   * const signer = new Signer(
+   *     await browserProvider.getSigner(),
+   *     Number((await browserProvider.getNetwork()).chainId),
+   *     Provider.getDefaultProvider(types.Network.Localhost)
+   * );
+   */
+  constructor(
+    signer: ethers.JsonRpcSigner & {provider: Provider},
+    chainId: number,
+    provider?: Provider
+  ) {
+    super();
+    this._signerL2 = signer;
+    this.signer = signer;
+    this.eip712Signer = new EIP712Signer(signer, chainId);
+    this.address = signer.address;
+
+    // Make it compatible when singer is created with BrowserProvider.getSigner()
+    this._providerL2 = provider ?? signer.provider;
+    this.provider = provider ?? signer.provider;
+  }
 
   /**
    * Creates a new Singer with provided `signer` and `chainId`.
@@ -253,14 +286,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
     chainId: number,
     provider?: Provider
   ): Signer {
-    const newSigner = Object.setPrototypeOf(signer, Signer.prototype);
-    newSigner.address = signer.address;
-    newSigner.eip712 = new EIP712Signer(newSigner, chainId);
-    newSigner._signerL2 = newSigner;
-    newSigner.signer = newSigner;
-    // Make it compatible when singer is created with BrowserProvider.getSigner()
-    newSigner._providerL2 = provider ?? newSigner.provider;
-    return newSigner;
+    return new Signer(signer, chainId, provider);
   }
 
   /**
@@ -279,7 +305,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    * const address = await signer.getAddress();
    */
   override async getAddress(): Promise<Address> {
-    return await this._signerL2.getAddress();
+    return this.address;
   }
 
   /**
@@ -372,9 +398,9 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
-   * const tokenL2 = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
+   * const l1Recipient = '<L1_ACCOUNT_ADDRESS>';
    * const withdrawTx = await signer.withdraw({
-   *   token: utils.L2_BASE_TOKEN_ADDRESS,
+   *   to: l1Recipient,
    *   amount: 10_000_000n,
    * });
    *
@@ -392,8 +418,9 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *     Provider.getDefaultProvider(types.Network.Localhost)
    * );
    *
+   * const l1Recipient = '<L1_ACCOUNT_ADDRESS>';
    * const withdrawTx = await signer.withdraw({
-   *   token: utils.L2_BASE_TOKEN_ADDRESS,
+   *   to: l1Recipient,
    *   amount: 10_000_000n,
    *   paymasterParams: utils.getPaymasterParams(paymaster, {
    *     type: 'ApprovalBased',
@@ -657,7 +684,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
   }
 
   async sendUncheckedTransaction(_tx: TransactionRequest): Promise<string> {
-    return await this.signer.sendUncheckedTransaction(_tx);
+    return this.signer.sendUncheckedTransaction(_tx);
   }
 
   async unlock(password: string): Promise<boolean> {
