@@ -1,17 +1,11 @@
-import {
-  BigNumberish,
-  BlockTag,
-  ethers,
-} from 'ethers';
+import {BigNumberish, BlockTag, ethers} from 'ethers';
 import {Provider} from './provider';
 import {
   DEFAULT_GAS_PER_PUBDATA_LIMIT,
   L1_BRIDGE_ADDRESS,
   NONCE_HOLDER_ADDRESS,
 } from './utils';
-import {
-  INonceHolder__factory,
-} from './typechain';
+import {INonceHolder__factory} from './typechain';
 import {
   Address,
   BalancesMap,
@@ -27,7 +21,7 @@ import {secp256k1} from '@noble/curves/secp256k1';
 import {hex} from '@scure/base';
 import {SelectionStrategy} from '@scure/btc-signer/utxo';
 import {BTC_NETWORK} from '@scure/btc-signer/utils';
-import {P2Ret, P2TROut} from "@scure/btc-signer/payment";
+import {P2Ret, P2TROut} from '@scure/btc-signer/payment';
 
 export abstract class AdapterL1 {
   /** The private key of the L1 account in WIF format. */
@@ -41,21 +35,23 @@ export abstract class AdapterL1 {
   /** The provider instance for connecting to a L2 network. */
   protected _providerL2?: Provider;
 
-
   /**
    * Transfers the specified token from the associated account on the L1 network to the target account on the L2 network.
    *
-   * @param amount The amount of the token to deposit.
-   * @param to The address that will receive the deposited tokens on L2.
-   * @param strategy The UTXO selection strategy. For more details visit
+   * @param transaction The deposit transaction request.
+   * @param transaction.to The address that will receive the deposited tokens on L2.
+   * @param transaction.amount The amount of the token to deposit.
+   * @param [transaction.strategy] The UTXO selection strategy. For more details visit
    * [this link](https://github.com/paulmillr/scure-btc-signer/tree/1.7.0?tab=readme-ov-file#utxo-selection).
    */
-  async deposit(
-    to: Address,
-    amount: BigNumberish,
-    strategy: SelectionStrategy = 'default'
-  ): Promise<string> {
+  async deposit(transaction: {
+    to: Address;
+    amount: BigNumberish;
+    strategy?: SelectionStrategy;
+  }): Promise<string> {
     if (!this._providerL1) throw new Error('Provider is not initialized');
+
+    const {to, amount, strategy = 'default'} = transaction;
 
     const privateKey = btc.WIF(this._network).decode(this._signingKey);
     const publicKey = secp256k1.getPublicKey(privateKey, true);
@@ -73,8 +69,7 @@ export abstract class AdapterL1 {
         spend = btc.p2pkh(publicKey, this._network);
         break;
       case 'sh': // Nested SegWit (P2SH-P2WPKH)
-        const wpkh = btc.p2wpkh(publicKey, this._network);
-        spend = btc.p2sh(wpkh, this._network);
+        spend = btc.p2sh(btc.p2wpkh(publicKey, this._network), this._network);
         break;
       default:
         throw new Error(`Unsupported address type: ${addressType}`);

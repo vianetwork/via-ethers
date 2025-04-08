@@ -477,9 +477,12 @@ describe('Wallet', () => {
       const amount = 70_000_000n;
       const l2BalanceBeforeDeposit = await wallet.getBalance();
 
-      const tx = await wallet.deposit(wallet.address, amount);
+      const tx = await wallet.deposit({
+        to: wallet.address,
+        amount,
+      });
       expect(tx).not.to.be.null;
-      await sleep(10_000)
+      await sleep(10_000);
 
       const l2BalanceAfterDeposit = await wallet.getBalance();
       expect(l2BalanceAfterDeposit - l2BalanceBeforeDeposit >= amount).to.be
