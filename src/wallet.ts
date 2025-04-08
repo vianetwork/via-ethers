@@ -98,14 +98,17 @@ export class WalletL1 extends AdapterL1 {
    * const wallet = new WalletL1(PRIVATE_KEY, ADDRESS, provider, utils.REGTEST_NETWORK);
    *
    * const l2Recipient = '<L2_ACCOUNT_ADDRESS>';
-   * const tx = await wallet.deposit(l2Recipient, 70_000_000n);
+   * const tx = await wallet.deposit({
+   *   to: l2Recipient,
+   *   amount: 70_000_000n
+   * });
    */
-  override async deposit(
-    to: Address,
-    amount: BigNumberish,
-    strategy: SelectionStrategy = 'default'
-  ): Promise<string> {
-    return super.deposit(to, amount, strategy);
+  override async deposit(transaction: {
+    to: Address;
+    amount: BigNumberish;
+    strategy?: SelectionStrategy;
+  }): Promise<string> {
+    return super.deposit(transaction);
   }
 
   /**
@@ -133,12 +136,7 @@ export class WalletL1 extends AdapterL1 {
    * const wallet = unconnectedWallet.connect(providerL1, utils.REGTEST_NETWORK);
    */
   connect(provider: BitcoinClient, network: BTC_NETWORK): WalletL1 {
-    return new WalletL1(
-      this._signingKey,
-      this._address,
-      provider,
-      network
-    );
+    return new WalletL1(this._signingKey, this._address, provider, network);
   }
 }
 
@@ -803,7 +801,12 @@ export class Wallet {
   ) {
     this._walletL2 = new WalletL2(privateKeyL2, providerL2);
     if (privateKeyL1 && addressL1)
-      this._walletL1 = new WalletL1(privateKeyL1, addressL1, providerL1, networkL1);
+      this._walletL1 = new WalletL1(
+        privateKeyL1,
+        addressL1,
+        providerL1,
+        networkL1
+      );
   }
 
   /**
@@ -845,9 +848,9 @@ export class Wallet {
    * Returns the address of the associated L1 account.
    */
   get addressL1() {
-    return this._walletL1?.address
+    return this._walletL1?.address;
   }
-  
+
   /**
    * Connects to the L2 network using `provider`.
    *
@@ -883,7 +886,7 @@ export class Wallet {
    * @param network The L1 network configuration.
    *
    * @see {@link connect} in order to connect to L2 network.
-   * 
+   *
    * @example
    *
    * import { Wallet, Provider, types, utils } from 'via-ethers';
@@ -900,7 +903,7 @@ export class Wallet {
    *     password: 'rpc-password',
    *     wallet: 'Personal',
    * });
-   * 
+   *
    * const unconnectedWallet = new Wallet(PRIVATE_KEY_L2, providerL2, PRIVATE_KEY_L1, ADDRESS_L1);
    * const wallet = unconnectedWallet.connectToL1(providerL1, utils.REGTEST_NETWORK);
    */
@@ -1015,9 +1018,9 @@ export class Wallet {
    *
    * const PRIVATE_KEY_L1 = '<L1_WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
    * const ADDRESS_L1 = '<WALLET_ADDRESS: tr|sh|wpkh|pkh>';
-   * 
+   *
    * const wallet = Wallet.fromEncryptedJsonSync(
-   *   fs.readFileSync('wallet.json', 'utf8'), 
+   *   fs.readFileSync('wallet.json', 'utf8'),
    *   'password',
    *   PRIVATE_KEY_L1
    * );
@@ -1341,9 +1344,10 @@ export class Wallet {
   /**
    * Transfers the specified token from the associated account on the L1 network to the target account on the L2 network.
    *
-   * @param amount The amount of the token to deposit.
-   * @param to The address that will receive the deposited tokens on L2.
-   * @param strategy The UTXO selection strategy. For more details visit
+   * @param transaction The deposit transaction request.
+   * @param transaction.to The address that will receive the deposited tokens on L2.
+   * @param transaction.amount The amount of the token to deposit.
+   * @param [transaction.strategy] The UTXO selection strategy. For more details visit
    * [this link](https://github.com/paulmillr/scure-btc-signer/tree/1.7.0?tab=readme-ov-file#utxo-selection).
    *
    * @example
@@ -1365,16 +1369,19 @@ export class Wallet {
    * const wallet = new Wallet(PRIVATE_KEY_L2, providerL2, PRIVATE_KEY_L1, ADDRESS_L1, providerL1, utils.REGTEST_NETWORK);
    *
    * const l2Recipient = '<L2_ACCOUNT_ADDRESS>';
-   * const tx = await wallet.deposit(l2Recipient, 70_000_000n);
+   * const tx = await wallet.deposit({
+   *   to: l2Recipient,
+   *   amount: 70_000_000n
+   * });
    */
-  async deposit(
-    to: Address,
-    amount: BigNumberish,
-    strategy: SelectionStrategy = 'default'
-  ): Promise<string> {
+  async deposit(transaction: {
+    to: Address;
+    amount: BigNumberish;
+    strategy?: SelectionStrategy;
+  }): Promise<string> {
     if (!this._walletL1)
       throw new Error('Wallet is not connected to L1 network');
-    return await this._walletL1.deposit(to, amount, strategy);
+    return await this._walletL1.deposit(transaction);
   }
 
   /**
