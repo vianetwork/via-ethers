@@ -1,12 +1,4 @@
-import {
-  BigNumberish,
-  BlockTag,
-  BytesLike,
-  ContractTransactionResponse,
-  ethers,
-  Overrides,
-  copyRequest,
-} from 'ethers';
+import {BigNumberish, BlockTag, ethers, Overrides, copyRequest} from 'ethers';
 import {Provider} from './provider';
 import {
   DEFAULT_GAS_PER_PUBDATA_LIMIT,
@@ -237,7 +229,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = new Signer(
@@ -272,7 +264,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -294,7 +286,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -313,7 +305,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Get BTC balance.
    *
-   * import { BrowserProvider, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -325,7 +317,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Get token balance.
    *
-   * import { BrowserProvider, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -349,7 +341,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -369,7 +361,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -388,7 +380,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Withdraw BTC.
    *
-   * import { BrowserProvider, Provider, types, utils } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types, utils } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
@@ -406,7 +398,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Withdraw BTC using paymaster to facilitate fee payment with an ERC20 token.
    *
-   * import { BrowserProvider, Provider, types, utils } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types, utils } from 'via-ethers';
    *
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
@@ -444,7 +436,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Transfer BTC.
    *
-   * import { BrowserProvider, Provider, Wallet, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, Wallet, types } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
@@ -465,7 +457,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Transfer BTC using paymaster to facilitate fee payment with an ERC20 token.
    *
-   * import { BrowserProvider, Provider, Wallet, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, Wallet, types } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
@@ -495,7 +487,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Transfer token.
    *
-   * import { BrowserProvider, Provider, Wallet, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, Wallet, types } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
@@ -518,7 +510,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Transfer token using paymaster to facilitate fee payment with an ERC20 token.
    *
-   * import { BrowserProvider, Provider, Wallet, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, Wallet, types } from 'via-ethers';
    * import { ethers } from 'ethers';
    *
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
@@ -563,7 +555,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @param [blockTag] The block tag to query. If provided, the transaction count is as of that block.
    *
-   * import { BrowserProvider, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -587,7 +579,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Provider, Wallet, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, Wallet, types } from 'via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -737,5 +729,209 @@ export class Signer extends AdapterL2 implements ethers.Signer {
     value: Record<string, any>
   ): Promise<string> {
     return await this.signer.signTypedData(domain, types, value);
+  }
+}
+
+/**
+ * A `VoidSigner` is an extension of {@link ethers.VoidSigner} class providing only L2 operations.
+ */
+export class VoidSigner extends AdapterL2 implements ethers.Signer {
+  provider: Provider | null;
+  address: string;
+
+  constructor(address: string, provider?: Provider) {
+    super();
+    this._signerL2 = new ethers.VoidSigner(address, provider);
+    this.address = address;
+    this.provider = provider ?? null;
+    this._providerL2 = provider;
+  }
+
+  /**
+   * @inheritDoc
+   *
+   * @example
+   *
+   * import { VoidSigner, Provider, types } from 'via-ethers';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const signer = new VoidSigner('<ADDRESS>', provider);
+   *
+   * const address = await signer.getAddress();
+   */
+  override async getAddress(): Promise<Address> {
+    return this.address;
+  }
+
+  /**
+   * @inheritDoc
+   *
+   * @example Get BTC balance.
+   *
+   * import { VoidSigner, Provider, types } from 'via-ethers';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const signer = new VoidSigner('<ADDRESS>', provider);
+   * const balance = await signer.getBalance();
+   *
+   * @example Get token balance.
+   *
+   * import { VoidSigner, Provider, types } from 'via-ethers';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const signer = new VoidSigner('<ADDRESS>', provider);
+   *
+   * const token = '0x6a4Fb925583F7D4dF82de62d98107468aE846FD1';
+   * const balance = await signer.getBalance(token);
+   */
+  override async getBalance(
+    token?: Address,
+    blockTag: BlockTag = 'committed'
+  ): Promise<bigint> {
+    return super.getBalance(token, blockTag);
+  }
+
+  /**
+   * @inheritDoc
+   *
+   * @example
+   *
+   * import { VoidSigner, Provider, types } from 'via-ethers';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const signer = new VoidSigner('<ADDRESS>', provider);
+   *
+   * const allBalances = await signer.getAllBalances();
+   */
+  override async getAllBalances(): Promise<BalancesMap> {
+    return super.getAllBalances();
+  }
+
+  /**
+   * @inheritDoc
+   *
+   * @example
+   *
+   * import { VoidSigner, Provider, types } from 'via-ethers';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const signer = new VoidSigner('<ADDRESS>', provider);
+   *
+   * const deploymentNonce = await signer.getDeploymentNonce();
+   */
+  override async getDeploymentNonce(): Promise<bigint> {
+    return super.getDeploymentNonce();
+  }
+
+  /**
+   * @inheritDoc
+   *
+   * @example
+   *
+   * import { VoidSigner, Provider, types } from 'via-ethers';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const signer = new VoidSigner('<ADDRESS>', provider);
+   *
+   * const nonce = await signer.getNonce();
+   */
+  async getNonce(blockTag?: BlockTag): Promise<number> {
+    return this._signerL2.getNonce(blockTag);
+  }
+
+  /**
+   * Designed for users who prefer a simplified approach by providing only the necessary data to create a valid transaction.
+   * The only required fields are `transaction.to` and either `transaction.data` or `transaction.value` (or both, if the method is payable).
+   * Any other fields that are not set will be prepared by this method.
+   *
+   * @param tx The transaction request that needs to be populated.
+   *
+   * @example
+   *
+   * import { Provider, VoidSigner, Wallet, types } from 'via-ethers';
+   *
+   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
+   * const signer = new VoidSigner('<ADDRESS>', provider);
+   *
+   * const populatedTx = await signer.populateTransaction({
+   *   to: Wallet.createRandom().address,
+   *   value: 7_000_000n,
+   *   maxFeePerGas: 3_500_000_000n,
+   *   maxPriorityFeePerGas: 2_000_000_000n,
+   *   customData: {
+   *     gasPerPubdata: utils.DEFAULT_GAS_PER_PUBDATA_LIMIT,
+   *     factoryDeps: [],
+   *   },
+   * });
+   */
+  async populateTransaction(tx: TransactionRequest): Promise<TransactionLike> {
+    if (!this.provider) throw new Error('Provider is not initialized');
+    if ((!tx.type || tx.type !== EIP712_TX_TYPE) && !tx.customData) {
+      return await this._signerL2.populateTransaction(tx);
+    }
+
+    tx.type = 2;
+    const populated = <TransactionLike>(
+      await this._signerL2.populateTransaction(tx)
+    );
+
+    populated.type = EIP712_TX_TYPE;
+    populated.value ??= 0;
+    populated.data ??= '0x';
+    populated.customData = this._fillCustomData(tx.customData ?? {});
+    if (!populated.maxFeePerGas && !populated.maxPriorityFeePerGas) {
+      populated.gasPrice = await this.provider.getGasPrice();
+    }
+    return populated;
+  }
+
+  override async sendTransaction(
+    tx: TransactionRequest
+  ): Promise<TransactionResponse> {
+    if (!this.provider) throw new Error('Provider is not initialized');
+    const populated = await this.populateTransaction(tx);
+
+    return this.provider.broadcastTransaction(
+      await this.signTransaction(populated)
+    );
+  }
+
+  connect(provider: Provider | null): VoidSigner {
+    return <VoidSigner>this._signerL2.connect(provider);
+  }
+
+  async populateCall(tx: TransactionRequest): Promise<TransactionLike> {
+    return await this._signerL2.populateCall(tx);
+  }
+
+  async estimateGas(tx: TransactionRequest): Promise<bigint> {
+    if (!this.provider) throw new Error('Provider is not initialized');
+    return await this.provider.estimateGas(tx);
+  }
+
+  async call(tx: TransactionRequest): Promise<string> {
+    if (!this.provider) throw new Error('Provider is not initialized');
+    return await this.provider.call(tx);
+  }
+
+  async resolveName(name: string): Promise<string | null> {
+    if (!this.provider) throw new Error('Provider is not initialized');
+    return await this.provider.resolveName(name);
+  }
+
+  async signTransaction(tx: TransactionRequest): Promise<string> {
+    return await this._signerL2.signTransaction(tx);
+  }
+
+  async signMessage(message: string | Uint8Array): Promise<string> {
+    return await this._signerL2.signMessage(message);
+  }
+
+  async signTypedData(
+    domain: ethers.TypedDataDomain,
+    types: Record<string, ethers.TypedDataField[]>,
+    value: Record<string, any>
+  ): Promise<string> {
+    return await this._signerL2.signTypedData(domain, types, value);
   }
 }
