@@ -39,8 +39,9 @@ export class WalletL1 extends AdapterL1 {
   /**
    * @param privateKey The private key of the L1 account in WIF format.
    * @param address The address of the associated L1 account. Supported types: `tr`, `sh`, `wpkh`, `pkh`.
-   * @param provider The provider instance for connecting to a L1 network.
-   * @param network The L1 network configuration.
+   * @param [provider] The provider instance for connecting to a L1 network.
+   * @param [network] The L1 network configuration.
+   * @param [providerL2] The provider instance for connecting to a L2 network.
    *
    * @example
    *
@@ -62,7 +63,8 @@ export class WalletL1 extends AdapterL1 {
     privateKey: string,
     address: string,
     provider?: BitcoinClient | null,
-    network: BTC_NETWORK = NETWORK
+    network?: BTC_NETWORK,
+    providerL2?: Provider | null
   ) {
     super();
     this._signingKey = privateKey;
@@ -71,11 +73,13 @@ export class WalletL1 extends AdapterL1 {
     this._address = address;
     this.address = address;
 
-    this._network = network;
-    this.network = network;
+    this._network = network ?? NETWORK;
+    this.network = network ?? NETWORK;
 
     this._providerL1 = provider ?? undefined;
     this.provider = provider ?? undefined;
+
+    this._providerL2 = providerL2 ?? undefined;
   }
 
   /**
@@ -805,7 +809,8 @@ export class Wallet {
         privateKeyL1,
         addressL1,
         providerL1,
-        networkL1
+        networkL1,
+        providerL2
       );
   }
 
