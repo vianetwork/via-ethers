@@ -214,9 +214,16 @@ export class EIP712Signer {
  * providing only L2 operations.
  */
 export class Signer extends AdapterL2 implements ethers.Signer {
+  /**
+   * The provider instance for connecting to a L2 network.
+   * Provides support to RPC methods from `zks` namespace.
+   */
   provider: Provider;
+  /** The signer responsible for interacting with injected browser wallet. */
   signer: ethers.JsonRpcSigner;
+  /** The EIP712 signer for signing EIP712 transaction. */
   eip712Signer: EIP712Signer;
+  /** Returns the address of the associated account. */
   address: string;
 
   /**
@@ -736,7 +743,9 @@ export class Signer extends AdapterL2 implements ethers.Signer {
  * A `VoidSigner` is an extension of {@link ethers.VoidSigner} class providing only L2 operations.
  */
 export class VoidSigner extends AdapterL2 implements ethers.Signer {
+  /** The provider instance for connecting to a L2 network. */
   provider: Provider | null;
+  /** Returns the address of the associated account. */
   address: string;
 
   constructor(address: string, provider?: Provider) {
@@ -905,18 +914,15 @@ export class VoidSigner extends AdapterL2 implements ethers.Signer {
   }
 
   async estimateGas(tx: TransactionRequest): Promise<bigint> {
-    if (!this.provider) throw new Error('Provider is not initialized');
-    return await this.provider.estimateGas(tx);
+    return await this._signerL2.estimateGas(tx);
   }
 
   async call(tx: TransactionRequest): Promise<string> {
-    if (!this.provider) throw new Error('Provider is not initialized');
-    return await this.provider.call(tx);
+    return await this._signerL2.call(tx);
   }
 
   async resolveName(name: string): Promise<string | null> {
-    if (!this.provider) throw new Error('Provider is not initialized');
-    return await this.provider.resolveName(name);
+    return await this._signerL2.resolveName(name);
   }
 
   async signTransaction(tx: TransactionRequest): Promise<string> {
