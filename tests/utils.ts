@@ -13,7 +13,7 @@ export const L1_ADDRESS1 = 'bcrt1qx2lk0unukm80qmepjp49hwf9z6xnz0s73k9j56';
 export const L1_PRIVATE_KEY1 =
   'cVZduZu265sWeAqFYygoDEE1FZ7wV9rpW5qdqjRkUehjaUMWLT1R';
 export const L2_CHAIN_URL = process.env.L2_CHAIN_URL ?? 'http://127.0.0.1:3050';
-export const L1_CHAIN_URL = 'http://127.0.0.1:18443';
+export const L1_CHAIN_URL = process.env.L1_CHAIN_URL ?? 'http://127.0.0.1:18443';
 export const L1_CHAIN_USER = 'rpcuser';
 export const L1_CHAIN_PASSWORD = 'rpcpassword';
 export const L1_CHAIN_WALLET = 'Watcher';
