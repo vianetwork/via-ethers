@@ -20,8 +20,7 @@ import {
   PRIVATE_KEY1,
 } from '../utils';
 import BitcoinClient from 'bitcoin-core';
-import {REGTEST_NETWORK} from '../../src/utils';
-import {sleep} from '../../build/utils';
+import {REGTEST_NETWORK, sleep} from '../../src/utils';
 
 const {expect} = chai;
 
