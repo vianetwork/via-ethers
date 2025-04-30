@@ -10,7 +10,6 @@ import {
 import {Provider} from './provider';
 import {
   Address,
-  BalancesMap,
   PayloadSigner,
   PaymasterParams,
   SmartAccountSigner,
@@ -179,31 +178,6 @@ export class SmartAccount extends AbstractSigner {
       blockTag,
       token
     );
-  }
-
-  /**
-   * Returns all token balances of the account.
-   *
-   * @example
-   *
-   * import { SmartAccount, Provider, types } from 'via-ethers';
-   *
-   * const ADDRESS = '<ADDRESS>';
-   * const PRIVATE_KEY = '<PRIVATE_KEY>';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const account = new SmartAccount(
-   *   {address: ADDRESS, secret: PRIVATE_KEY},
-   *   provider
-   * );
-   *
-   * const balances = await account.getAllBalances();
-   */
-  async getAllBalances(): Promise<BalancesMap> {
-    return await checkProvider(
-      this,
-      'getAllAccountBalances'
-    ).getAllAccountBalances(await this.getAddress());
   }
 
   /**

@@ -18,7 +18,7 @@ import {
   PAYMASTER,
   L2_CHAIN_URL,
   DAI,
-  L1_ADDRESS1,
+  L1_ADDRESS1_NATIVE_SEGWIT,
 } from '../utils';
 
 const {expect} = chai;
@@ -117,14 +117,6 @@ describe('SmartAccount', async () => {
     });
   });
 
-  describe('#getAllBalances()', () => {
-    it('should return all balances', async () => {
-      const result = await account.getAllBalances();
-      const expected = 1;
-      expect(Object.keys(result)).to.have.lengthOf(expected);
-    });
-  });
-
   describe('#getDeploymentNonce()', () => {
     it('should return the deployment nonce', async () => {
       const result = await account.getDeploymentNonce();
@@ -157,6 +149,7 @@ describe('SmartAccount', async () => {
         'gasLimit',
         'chainId',
         'customData',
+        'maxFeePerGas',
       ]);
       expect(BigInt(result.gasLimit!) > 0n).to.be.true;
     }).timeout(25_000);
@@ -182,6 +175,7 @@ describe('SmartAccount', async () => {
         'gasLimit',
         'chainId',
         'customData',
+        'maxFeePerGas',
       ]);
       expect(BigInt(result.gasLimit!) > 0n).to.be.true;
     });
@@ -399,7 +393,7 @@ describe('SmartAccount', async () => {
       const amount = 10_000_000_000n;
       const l2BalanceBeforeWithdrawal = await account.getBalance();
       const withdrawTx = await account.withdraw({
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
         amount: amount,
       });
       await withdrawTx.wait();
@@ -425,7 +419,7 @@ describe('SmartAccount', async () => {
         await account.getBalance(APPROVAL_TOKEN);
 
       const withdrawTx = await account.withdraw({
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
         amount: amount,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',
@@ -699,7 +693,7 @@ describe('MultisigECDSASmartAccount', async () => {
       const amount = 10_000_000_000n;
       const l2BalanceBeforeWithdrawal = await account.getBalance();
       const withdrawTx = await account.withdraw({
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
         amount: amount,
       });
       await withdrawTx.wait();
@@ -725,7 +719,7 @@ describe('MultisigECDSASmartAccount', async () => {
         await account.getBalance(APPROVAL_TOKEN);
 
       const withdrawTx = await account.withdraw({
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
         amount: amount,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',

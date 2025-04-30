@@ -9,7 +9,6 @@ import {
 } from './utils';
 import {
   Address,
-  BalancesMap,
   PaymasterParams,
   Signature,
   TransactionLike,
@@ -341,26 +340,6 @@ export class Signer extends AdapterL2 implements ethers.Signer {
     blockTag: BlockTag = 'committed'
   ): Promise<bigint> {
     return super.getBalance(token, blockTag);
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
-   *
-   * const browserProvider = new BrowserProvider(window.ethereum);
-   * const signer = Signer.from(
-   *     await browserProvider.getSigner(),
-   *     Number((await browserProvider.getNetwork()).chainId),
-   *     Provider.getDefaultProvider(types.Network.Localhost)
-   * );
-   *
-   * const allBalances = await signer.getAllBalances();
-   */
-  override async getAllBalances(): Promise<BalancesMap> {
-    return super.getAllBalances();
   }
 
   /**
@@ -798,22 +777,6 @@ export class VoidSigner extends AdapterL2 implements ethers.Signer {
     blockTag: BlockTag = 'committed'
   ): Promise<bigint> {
     return super.getBalance(token, blockTag);
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { VoidSigner, Provider, types } from 'via-ethers';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const signer = new VoidSigner('<ADDRESS>', provider);
-   *
-   * const allBalances = await signer.getAllBalances();
-   */
-  override async getAllBalances(): Promise<BalancesMap> {
-    return super.getAllBalances();
   }
 
   /**

@@ -8,7 +8,10 @@ import {
   ADDRESS2,
   APPROVAL_TOKEN,
   DAI,
-  L1_ADDRESS1,
+  L1_ADDRESS1_LEGACY,
+  L1_ADDRESS1_NATIVE_SEGWIT,
+  L1_ADDRESS1_NESTED_SEGWIT,
+  L1_ADDRESS1_TAPROOT,
   L1_CHAIN_PASSWORD,
   L1_CHAIN_URL,
   L1_CHAIN_USER,
@@ -36,7 +39,7 @@ describe('Wallet', () => {
     PRIVATE_KEY1,
     providerL2,
     L1_PRIVATE_KEY1,
-    L1_ADDRESS1,
+    L1_ADDRESS1_NATIVE_SEGWIT,
     providerL1,
     REGTEST_NETWORK
   );
@@ -57,7 +60,7 @@ describe('Wallet', () => {
         PRIVATE_KEY1,
         providerL2,
         L1_PRIVATE_KEY1,
-        L1_ADDRESS1,
+        L1_ADDRESS1_NATIVE_SEGWIT,
         providerL1,
         REGTEST_NETWORK
       );
@@ -65,7 +68,7 @@ describe('Wallet', () => {
       expect(wallet.signingKey.privateKey).to.be.equal(PRIVATE_KEY1);
       expect(wallet.provider).to.be.equal(providerL2);
       expect(wallet.signingKeyL1).to.be.equal(L1_PRIVATE_KEY1);
-      expect(wallet.addressL1).to.be.equal(L1_ADDRESS1);
+      expect(wallet.addressL1).to.be.equal(L1_ADDRESS1_NATIVE_SEGWIT);
       expect(wallet.providerL1).to.be.equal(providerL1);
     });
   });
@@ -74,14 +77,6 @@ describe('Wallet', () => {
     it('should return a `Wallet` balance', async () => {
       const result = await wallet.getBalance();
       expect(result > 0n).to.be.true;
-    });
-  });
-
-  describe('#getAllBalances()', () => {
-    it('should return the all balances', async () => {
-      const result = await wallet.getAllBalances();
-      const expected = 1;
-      expect(Object.keys(result)).to.have.lengthOf(expected);
     });
   });
 
@@ -103,12 +98,17 @@ describe('Wallet', () => {
 
   describe('#connectL1()', () => {
     it('should return a `Wallet` with provided `provider` as L1 provider', async () => {
-      let wallet = new Wallet(PRIVATE_KEY1, null, L1_PRIVATE_KEY1, L1_ADDRESS1);
+      let wallet = new Wallet(
+        PRIVATE_KEY1,
+        null,
+        L1_PRIVATE_KEY1,
+        L1_ADDRESS1_NATIVE_SEGWIT
+      );
       wallet = wallet.connectToL1(providerL1, REGTEST_NETWORK);
       expect(wallet.signingKey.privateKey).to.be.equal(PRIVATE_KEY1);
       expect(wallet.provider).to.be.null;
       expect(wallet.signingKeyL1).to.be.equal(L1_PRIVATE_KEY1);
-      expect(wallet.addressL1).to.be.equal(L1_ADDRESS1);
+      expect(wallet.addressL1).to.be.equal(L1_ADDRESS1_NATIVE_SEGWIT);
       expect(wallet.providerL1).to.be.equal(providerL1);
     });
   });
@@ -146,6 +146,7 @@ describe('Wallet', () => {
         'chainId',
         'chainId',
         'customData',
+        'maxFeePerGas',
       ]);
       expect(BigInt(result.gasLimit!) > 0n).to.be.true;
     }).timeout(25_000);
@@ -422,14 +423,14 @@ describe('Wallet', () => {
         MNEMONIC1,
         providerL2,
         L1_PRIVATE_KEY1,
-        L1_ADDRESS1,
+        L1_ADDRESS1_NATIVE_SEGWIT,
         providerL1,
         REGTEST_NETWORK
       );
       expect(wallet.signingKey.privateKey).to.be.equal(PRIVATE_KEY1);
       expect(wallet.provider).to.be.equal(providerL2);
       expect(wallet.signingKeyL1).to.be.equal(L1_PRIVATE_KEY1);
-      expect(wallet.addressL1).to.be.equal(L1_ADDRESS1);
+      expect(wallet.addressL1).to.be.equal(L1_ADDRESS1_NATIVE_SEGWIT);
       expect(wallet.providerL1).to.be.equal(providerL1);
     });
   });
@@ -459,26 +460,152 @@ describe('Wallet', () => {
       const wallet = Wallet.createRandom(
         providerL2,
         L1_PRIVATE_KEY1,
-        L1_ADDRESS1,
+        L1_ADDRESS1_NATIVE_SEGWIT,
         providerL1,
         REGTEST_NETWORK
       );
       expect(wallet.signingKey.privateKey).not.to.be.null;
       expect(wallet.provider).to.be.equal(providerL2);
       expect(wallet.signingKeyL1).to.be.equal(L1_PRIVATE_KEY1);
-      expect(wallet.addressL1).to.be.equal(L1_ADDRESS1);
+      expect(wallet.addressL1).to.be.equal(L1_ADDRESS1_NATIVE_SEGWIT);
       expect(wallet.providerL1).to.be.equal(providerL1);
     });
   });
 
   describe('#deposit()', () => {
-    it('should deposit BTC to L2 network', async () => {
+    it('should deposit BTC to L2 network using Native SegWit address', async () => {
       const amount = 70_000_000n;
       const l2BalanceBeforeDeposit = await wallet.getBalance();
 
       const tx = await wallet.deposit({
         to: wallet.address,
         amount,
+      });
+      expect(tx).not.to.be.null;
+      await sleep(10_000);
+
+      const l2BalanceAfterDeposit = await wallet.getBalance();
+      expect(l2BalanceAfterDeposit - l2BalanceBeforeDeposit >= amount).to.be
+        .true;
+    }).timeout(20_000);
+
+    it('should deposit BTC to L2 network using Nested SegWit address', async () => {
+      const wallet = new Wallet(
+        PRIVATE_KEY1,
+        providerL2,
+        L1_PRIVATE_KEY1,
+        L1_ADDRESS1_NESTED_SEGWIT,
+        providerL1,
+        REGTEST_NETWORK
+      );
+
+      const amount = 70_000_000n;
+      const l2BalanceBeforeDeposit = await wallet.getBalance();
+
+      const tx = await wallet.deposit({
+        to: wallet.address,
+        amount,
+      });
+      expect(tx).not.to.be.null;
+      await sleep(10_000);
+
+      const l2BalanceAfterDeposit = await wallet.getBalance();
+      expect(l2BalanceAfterDeposit - l2BalanceBeforeDeposit >= amount).to.be
+        .true;
+    }).timeout(20_000);
+
+    it('should deposit BTC to L2 network using Taproot address', async () => {
+      const wallet = new Wallet(
+        PRIVATE_KEY1,
+        providerL2,
+        L1_PRIVATE_KEY1,
+        L1_ADDRESS1_TAPROOT,
+        providerL1,
+        REGTEST_NETWORK
+      );
+
+      const amount = 70_000_000n;
+      const l2BalanceBeforeDeposit = await wallet.getBalance();
+
+      const tx = await wallet.deposit({
+        to: wallet.address,
+        amount,
+      });
+      expect(tx).not.to.be.null;
+      await sleep(10_000);
+
+      const l2BalanceAfterDeposit = await wallet.getBalance();
+      expect(l2BalanceAfterDeposit - l2BalanceBeforeDeposit >= amount).to.be
+        .true;
+    }).timeout(20_000);
+
+    it('should deposit BTC to L2 network using Legacy address', async () => {
+      const wallet = new Wallet(
+        PRIVATE_KEY1,
+        providerL2,
+        L1_PRIVATE_KEY1,
+        L1_ADDRESS1_LEGACY,
+        providerL1,
+        REGTEST_NETWORK
+      );
+
+      const amount = 70_000_000n;
+      const l2BalanceBeforeDeposit = await wallet.getBalance();
+
+      const tx = await wallet.deposit({
+        to: wallet.address,
+        amount,
+      });
+      expect(tx).not.to.be.null;
+      await sleep(10_000);
+
+      const l2BalanceAfterDeposit = await wallet.getBalance();
+      expect(l2BalanceAfterDeposit - l2BalanceBeforeDeposit >= amount).to.be
+        .true;
+    }).timeout(20_000);
+
+    it('should deposit BTC to L2 network using strategy `exactBiggest/accumSmallest`', async () => {
+      const amount = 70_000_000n;
+      const l2BalanceBeforeDeposit = await wallet.getBalance();
+
+      const tx = await wallet.deposit({
+        to: wallet.address,
+        amount,
+        strategy: 'exactBiggest/accumSmallest',
+      });
+      expect(tx).not.to.be.null;
+      await sleep(10_000);
+
+      const l2BalanceAfterDeposit = await wallet.getBalance();
+      expect(l2BalanceAfterDeposit - l2BalanceBeforeDeposit >= amount).to.be
+        .true;
+    }).timeout(20_000);
+
+    it('should deposit BTC to L2 network using strategy `exactSmallest/accumBiggest`', async () => {
+      const amount = 70_000_000n;
+      const l2BalanceBeforeDeposit = await wallet.getBalance();
+
+      const tx = await wallet.deposit({
+        to: wallet.address,
+        amount,
+        strategy: 'exactSmallest/accumBiggest',
+      });
+      expect(tx).not.to.be.null;
+      await sleep(10_000);
+
+      const l2BalanceAfterDeposit = await wallet.getBalance();
+      expect(l2BalanceAfterDeposit - l2BalanceBeforeDeposit >= amount).to.be
+        .true;
+    }).timeout(20_000);
+
+    it('should deposit BTC to L2 network using strategy `all`', async () => {
+      const amount = 70_000_000n;
+      const l2BalanceBeforeDeposit = await wallet.getBalance();
+
+      const tx = await wallet.deposit({
+        to: wallet.address,
+        amount,
+        strategy: 'all',
       });
       expect(tx).not.to.be.null;
       await sleep(10_000);
@@ -494,7 +621,7 @@ describe('Wallet', () => {
       const amount = 10_000_000_000n;
       const l2BalanceBeforeWithdrawal = await wallet.getBalance();
       const withdrawTx = await wallet.withdraw({
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
         amount: amount,
       });
       await withdrawTx.wait();
@@ -520,7 +647,7 @@ describe('Wallet', () => {
         await wallet.getBalance(APPROVAL_TOKEN);
 
       const withdrawTx = await wallet.withdraw({
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
         amount: amount,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',

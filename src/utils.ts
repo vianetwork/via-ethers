@@ -5,8 +5,6 @@ import {
   Eip712Meta,
   EthereumSignature,
   PaymasterParams,
-  PriorityOpTree,
-  PriorityQueueType,
   Transaction,
   TransactionLike,
   TransactionReceipt,
@@ -14,8 +12,6 @@ import {
 } from './types';
 import {Provider} from './provider';
 import {EIP712Signer} from './signer';
-import IZkSyncABI from '../abi/IZkSyncHyperchain.json';
-import IBridgehubABI from '../abi/IBridgehub.json';
 import IContractDeployerABI from '../abi/IContractDeployer.json';
 import Contract2FactoryABI from '../abi/Contract2Factory.json';
 import IERC20ABI from '../abi/IERC20.json';
@@ -26,18 +22,6 @@ import {BTC_NETWORK} from '@scure/btc-signer/src/utils';
 export * from './paymaster-utils';
 export * from './smart-account-utils';
 export {EIP712_TYPES} from './signer';
-
-/**
- * The ABI for the `ZKsync` interface.
- * @readonly
- */
-export const ZKSYNC_MAIN_ABI = new ethers.Interface(IZkSyncABI);
-
-/**
- * The ABI of the `Bridgehub` interface.
- * @readonly
- */
-export const BRIDGEHUB_ABI = new ethers.Interface(IBridgehubABI);
 
 /**
  * The ABI for the `IContractDeployer` interface, which is utilized for deploying smart contracts.
@@ -69,26 +53,12 @@ export const IERC1271 = new ethers.Interface(IERC1271ABI);
  */
 export const NONCE_HOLDER_ABI = new ethers.Interface(INonceHolderABI);
 
-/**
- * The address of the L1 bridge.
- * @readonly
- */
-export const L1_BRIDGE_ADDRESS =
-  'bcrt1p3s7m76wp5seprjy4gdxuxrr8pjgd47q5s8lu9vefxmp0my2p4t9qh6s8kq';
-
 export const REGTEST_NETWORK: BTC_NETWORK = {
   bech32: 'bcrt',
   pubKeyHash: 0x6f,
   scriptHash: 0xc4,
   wif: 0xef,
 };
-
-/**
- * The formal address for the `Bootloader`.
- * @readonly
- */
-export const BOOTLOADER_FORMAL_ADDRESS: Address =
-  '0x0000000000000000000000000000000000008001';
 
 /**
  * The address of the Contract deployer.
@@ -126,13 +96,6 @@ export const NONCE_HOLDER_ADDRESS: Address =
   '0x0000000000000000000000000000000000008003';
 
 /**
- * Used for applying and undoing aliases on addresses during bridging from L1 to L2.
- * @readonly
- */
-export const L1_TO_L2_ALIAS_OFFSET: Address =
-  '0x1111000000000000000000000000000000001111';
-
-/**
  * The EIP1271 magic value used for signature validation in smart contracts.
  * This predefined constant serves as a standardized indicator to signal successful
  * signature validation by the contract.
@@ -147,13 +110,6 @@ export const EIP1271_MAGIC_VALUE = '0x1626ba7e';
  * @readonly
  */
 export const EIP712_TX_TYPE = 0x71;
-
-/**
- * Represents a priority transaction operation on L2.
- *
- * @readonly
- */
-export const PRIORITY_OPERATION_L2_TX_TYPE = 0xff;
 
 /**
  * The maximum bytecode length in bytes that can be deployed.
@@ -173,13 +129,6 @@ export const MAX_BYTECODE_LEN_BYTES: number = ((1 << 16) - 1) * 32;
 export const DEFAULT_GAS_PER_PUBDATA_LIMIT = 50_000;
 
 /**
- * The `L1->L2` transactions are required to have the following gas per pubdata byte.
- *
- * @readonly
- */
-export const REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT = 800;
-
-/**
  * Pauses execution for a specified number of milliseconds.
  *
  * @param millis The number of milliseconds to pause execution.
@@ -192,19 +141,6 @@ export const REQUIRED_L1_TO_L2_GAS_PER_PUBDATA_LIMIT = 800;
  */
 export function sleep(millis: number): Promise<unknown> {
   return new Promise(resolve => setTimeout(resolve, millis));
-}
-
-/**
- * Returns the default settings for L1 transactions.
- */
-export function layer1TxDefaults(): {
-  queueType: PriorityQueueType.Deque;
-  opTree: PriorityOpTree.Full;
-} {
-  return {
-    queueType: PriorityQueueType.Deque,
-    opTree: PriorityOpTree.Full,
-  };
 }
 
 /**
@@ -353,37 +289,6 @@ export function createAddress(
     .slice(26);
 
   return ethers.getAddress(addressBytes);
-}
-
-/**
- * Checks if the transaction's base cost is greater than the provided value, which covers the transaction's cost.
- *
- * @param baseCost The base cost of the transaction.
- * @param value The value covering the transaction's cost.
- * @throws {Error} The base cost must be greater than the provided value.
- *
- * @example
- *
- * import { utils } from 'via-ethers';
- *
- * const baseCost = 100;
- * const value = 99;
- * try {
- *   await utils.checkBaseCost(baseCost, value);
- * } catch (e) {
- *   // e.message = `The base cost of performing the priority operation is higher than the provided value parameter for the transaction: baseCost: ${baseCost}, provided value: ${value}`,
- * }
- */
-export async function checkBaseCost(
-  baseCost: ethers.BigNumberish,
-  value: ethers.BigNumberish | Promise<ethers.BigNumberish>
-): Promise<void> {
-  if (baseCost > (await value)) {
-    throw new Error(
-      'The base cost of performing the priority operation is higher than the provided value parameter ' +
-        `for the transaction: baseCost: ${baseCost}, provided value: ${value}!`
-    );
-  }
 }
 
 /**
@@ -812,57 +717,6 @@ export function eip712TxHash(
   );
 
   return ethers.keccak256(ethers.concat([signedDigest, hashedSignature]));
-}
-
-/**
- * Returns the hash of the L2 priority operation from a given transaction receipt and L2 address.
- *
- * @param txReceipt The receipt of the L1 transaction.
- * @param zkSyncAddress The address of the ZKsync Era main contract.
- *
- * @example
- *
- * import { Provider, types, utils } from 'via-ethers';
- * import { ethers } from 'ethers';
- *
- * const provider = Provider.getDefaultProvider(types.Network.Localhost);
- * const ethProvider = ethers.getDefaultProvider('Localhost');
- * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
- * const l1TxReceipt = await ethProvider.getTransactionReceipt(l1Tx);
- * if (l1TxReceipt) {
- *   const l2Hash = getL2HashFromPriorityOp(
- *     receipt as ethers.TransactionReceipt,
- *     await provider.getMainContractAddress()
- *   );
- * }
- */
-export function getL2HashFromPriorityOp(
-  txReceipt: ethers.TransactionReceipt,
-  zkSyncAddress: Address
-): string {
-  let txHash: string | null = null;
-  for (const log of txReceipt.logs) {
-    if (!isAddressEq(log.address, zkSyncAddress)) {
-      continue;
-    }
-
-    try {
-      const priorityQueueLog = ZKSYNC_MAIN_ABI.parseLog({
-        topics: log.topics as string[],
-        data: log.data,
-      });
-      if (priorityQueueLog && priorityQueueLog.args.txHash !== null) {
-        txHash = priorityQueueLog.args.txHash;
-      }
-    } catch {
-      // skip
-    }
-  }
-  if (!txHash) {
-    throw new Error('Failed to parse tx logs!');
-  }
-
-  return txHash;
 }
 
 /**

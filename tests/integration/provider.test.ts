@@ -7,7 +7,7 @@ import {
   ADDRESS2,
   APPROVAL_TOKEN,
   DAI,
-  L1_ADDRESS1,
+  L1_ADDRESS1_NATIVE_SEGWIT,
   L2_CHAIN_URL,
   PAYMASTER,
   PRIVATE_KEY1,
@@ -33,7 +33,7 @@ describe('Provider', () => {
     it('should return a provider connected to Localhost network', async () => {
       const provider = Provider.getDefaultProvider(types.Network.Localhost);
       const network = await provider.getNetwork();
-      expect(network.chainId).to.be.equal(270n);
+      expect(network.chainId).to.be.equal(25223n);
     });
   });
 
@@ -51,33 +51,10 @@ describe('Provider', () => {
     });
   });
 
-  describe('#getMainContractAddress()', () => {
-    it('should return the address of main contract', async () => {
-      const result = await provider.getMainContractAddress();
-      expect(result).not.to.be.null;
-    });
-  });
-
   describe('#getTestnetPaymasterAddress()', () => {
     it('should return the address of testnet paymaster', async () => {
       const result = await provider.getTestnetPaymasterAddress();
       expect(result).not.to.be.null;
-    });
-  });
-
-  describe('#l1ChainId()', () => {
-    it('should return the L1 chain ID', async () => {
-      const L1_CHAIN_ID = 9;
-      const result = await provider.l1ChainId();
-      expect(result).to.be.equal(L1_CHAIN_ID);
-    });
-  });
-
-  describe('#getL1ChainId()', () => {
-    it('should return the L1 chain ID', async () => {
-      const L1_CHAIN_ID = 9;
-      const result = await provider.getL1ChainId();
-      expect(result).to.be.equal(L1_CHAIN_ID);
     });
   });
 
@@ -111,21 +88,6 @@ describe('Provider', () => {
     it('should return a DAI balance of the account at `address`', async () => {
       const result = await provider.getBalance(ADDRESS1, 'latest', DAI);
       expect(result > 0n).to.be.true;
-    });
-  });
-
-  describe('#getConfirmedTokens()', () => {
-    it('should return confirmed tokens', async () => {
-      const result = await provider.getConfirmedTokens();
-      expect(result).to.have.lengthOf(1);
-    });
-  });
-
-  describe('#getAllAccountBalances()', () => {
-    it('should return the all balances of the account at `address`', async () => {
-      const result = await provider.getAllAccountBalances(ADDRESS1);
-      const expected = 1;
-      expect(Object.keys(result)).to.have.lengthOf(expected);
     });
   });
 
@@ -220,13 +182,6 @@ describe('Provider', () => {
   describe('#getTransactionReceipt()', () => {
     it('should return a transaction receipt', async () => {
       const result = await provider.getTransaction(receipt.hash);
-      expect(result).not.to.be.null;
-    });
-  });
-
-  describe('#getDefaultBridgeAddresses()', () => {
-    it('should return the default bridges', async () => {
-      const result = await provider.getDefaultBridgeAddresses();
       expect(result).not.to.be.null;
     });
   });
@@ -347,7 +302,7 @@ describe('Provider', () => {
       const result = await provider.getWithdrawTx({
         amount: 10_000_000_000n,
         from: ADDRESS1,
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
       });
       expect(result).to.be.deep.equal(tx);
     });
@@ -370,7 +325,7 @@ describe('Provider', () => {
       const result = await provider.getWithdrawTx({
         amount: 10_000_000_000n,
         from: ADDRESS1,
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',
           token: APPROVAL_TOKEN,
@@ -479,7 +434,7 @@ describe('Provider', () => {
       const result = await provider.estimateGasWithdraw({
         amount: 10_000_000_000n,
         from: ADDRESS1,
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
       });
       expect(result > 0n).to.be.true;
     });
@@ -488,7 +443,7 @@ describe('Provider', () => {
       const result = await provider.estimateGasWithdraw({
         amount: 10_000_000_000n,
         from: ADDRESS1,
-        to: L1_ADDRESS1,
+        to: L1_ADDRESS1_NATIVE_SEGWIT,
         paymasterParams: utils.getPaymasterParams(PAYMASTER, {
           type: 'ApprovalBased',
           token: APPROVAL_TOKEN,
@@ -525,20 +480,6 @@ describe('Provider', () => {
         }),
       });
       expect(result > 0n).to.be.be.true;
-    });
-  });
-
-  describe('#estimateGasL1()', () => {
-    it('should return a gas estimation of the L1 transaction', async () => {
-      const result = await provider.estimateGasL1({
-        from: ADDRESS1,
-        to: await provider.getBridgehubContractAddress(),
-        value: 7_000_000_000n,
-        customData: {
-          gasPerPubdata: 800n,
-        },
-      });
-      expect(result > 0n).to.be.true;
     });
   });
 

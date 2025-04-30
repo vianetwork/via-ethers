@@ -1,14 +1,9 @@
 import {BigNumberish, BlockTag, ethers} from 'ethers';
 import {Provider} from './provider';
-import {
-  DEFAULT_GAS_PER_PUBDATA_LIMIT,
-  L1_BRIDGE_ADDRESS,
-  NONCE_HOLDER_ADDRESS,
-} from './utils';
+import {DEFAULT_GAS_PER_PUBDATA_LIMIT, NONCE_HOLDER_ADDRESS} from './utils';
 import {INonceHolder__factory} from './typechain';
 import {
   Address,
-  BalancesMap,
   Eip712Meta,
   PaymasterParams,
   TransactionRequest,
@@ -43,15 +38,28 @@ export abstract class AdapterL1 {
    * @param transaction.amount The amount of the token to deposit.
    * @param [transaction.strategy] The UTXO selection strategy. For more details visit
    * [this link](https://github.com/paulmillr/scure-btc-signer/tree/1.7.0?tab=readme-ov-file#utxo-selection).
+   * @param [transaction.opts] Optional transaction customization parameters.
+   * @param [transaction.opts.feePerByte] The amount of satoshi per vbyte.
+   * @param [transaction.opts.alwaysChange] Weather to always create change, even if less than dust threshold.
+   * @param [transaction.opts.dust] The vbyte threshold below which outputs are considered dust and avoided.
+   * @param [transaction.opts.dustRelayFeeRate] The relay fee rate (satoshi per vbyte) to define what is considered dust.
+   * @returns The transaction ID (txid) of the broadcasted L1 transaction.
    */
   async deposit(transaction: {
     to: Address;
     amount: BigNumberish;
     strategy?: SelectionStrategy;
+    opts?: {
+      feePerByte: bigint;
+      alwaysChange?: boolean;
+      dust?: number;
+      dustRelayFeeRate?: bigint;
+    };
   }): Promise<string> {
-    if (!this._providerL1) throw new Error('Provider is not initialized');
+    if (!this._providerL1) throw new Error('L1 provider is not initialized');
+    if (!this._providerL2) throw new Error('L2 provider is not initialized');
 
-    const {to, amount, strategy = 'default'} = transaction;
+    const {to, amount, strategy = 'default', opts} = transaction;
 
     const privateKey = btc.WIF(this._network).decode(this._signingKey);
     const publicKey = secp256k1.getPublicKey(privateKey, true);
@@ -63,7 +71,7 @@ export abstract class AdapterL1 {
         spend = btc.p2wpkh(publicKey, this._network);
         break;
       case 'tr': // Taproot (P2TR)
-        spend = btc.p2tr(publicKey, undefined, this._network);
+        spend = btc.p2tr(publicKey.slice(1), undefined, this._network);
         break;
       case 'pkh': // Legacy (P2PKH)
         spend = btc.p2pkh(publicKey, this._network);
@@ -82,19 +90,28 @@ export abstract class AdapterL1 {
       [this._address]
     );
 
-    const inputs = utxos.map(utxo => ({
-      ...spend,
-      txid: hex.decode(utxo.txid),
-      index: utxo.vout,
-      witnessUtxo: {
-        script: spend.script,
-        amount: btc.Decimal.decode(String(utxo.amount)),
-      },
-    }));
+    const inputs = [];
+    for (const utxo of utxos) {
+      inputs.push({
+        ...spend,
+        txid: hex.decode(utxo.txid),
+        index: utxo.vout,
+        witnessUtxo: {
+          script: spend.script,
+          amount: btc.Decimal.decode(String(utxo.amount)),
+        },
+        nonWitnessUtxo:
+          addressType === 'pkh'
+            ? hex.decode(
+                await this._providerL1.command('getrawtransaction', utxo.txid)
+              )
+            : undefined,
+      });
+    }
 
     const outputs = [
       {
-        address: L1_BRIDGE_ADDRESS,
+        address: await this._providerL2.getBridgeAddress(),
         amount: BigInt(amount),
       },
       {
@@ -103,10 +120,12 @@ export abstract class AdapterL1 {
       },
     ];
 
+    const feePerByte =
+      opts?.feePerByte ?? (await this._providerL2.getL1GasPrice());
+
     const selected = btc.selectUTXO(inputs, outputs, strategy, {
       changeAddress: this._address, // required, address to send change
-      // TODO: check the gas from the server
-      feePerByte: 2n,
+      feePerByte,
       bip69: true,
       createTx: true,
       network: this._network,
@@ -157,16 +176,6 @@ export abstract class AdapterL2 {
       await this.getAddress(),
       blockTag,
       token
-    );
-  }
-
-  /**
-   * Returns all token balances of the account.
-   */
-  async getAllBalances(): Promise<BalancesMap> {
-    if (!this._providerL2) throw new Error('Provider is not initialized');
-    return await this._providerL2.getAllAccountBalances(
-      await this.getAddress()
     );
   }
 
