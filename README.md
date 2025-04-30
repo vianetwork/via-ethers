@@ -1,4 +1,4 @@
-# 🚀 zksync-ethers JavaScript SDK 🚀
+# 🚀 via-ethers JavaScript SDK 🚀
 
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE-MIT)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-orange)](LICENSE-APACHE)
@@ -6,7 +6,7 @@
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-orange)](.github/CONTRIBUTING.md)
 [![Code Style: Google](https://img.shields.io/badge/code%20style-google-blueviolet.svg)](https://github.com/google/gts)
 
-[![Banner](viaBanner.png)](https://onvia.org/)
+[![Banner](logo.png)](https://onvia.org/)
 
 In order to provide easy access to all the features of Via network, the `via-ethers` JavaScript SDK was created,
 which is made in a way that has an interface very similar to those of [ethers](https://docs.ethers.io/v6/). In

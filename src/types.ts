@@ -27,7 +27,7 @@ export type Signature = string;
 /** Ethereum network. */
 export enum Network {
   Mainnet = 1,
-  Localhost = 9,
+  Localhost = 25223,
   EraTestNode = 10,
 }
 
@@ -657,12 +657,6 @@ export interface PriorityOpResponse extends TransactionResponse {
   waitL1Commit(confirmation?: number): Promise<ethers.TransactionReceipt>;
 }
 
-/**
- * A map  with token addresses as keys and their corresponding balances as values.
- * Each key-value pair represents the balance of a specific token held by the account.
- */
-export type BalancesMap = {[key: string]: bigint};
-
 /** Represents deployment information. */
 export interface DeploymentInfo {
   /** The account responsible for deployment. */
@@ -904,22 +898,6 @@ export interface RawBlockTransaction {
   received_timestamp_ms: number;
   /** Raw bytes of the transaction as a hexadecimal string. */
   raw_bytes: string | null;
-}
-
-/** Contains parameters for finalizing the withdrawal transaction. */
-export interface FinalizeWithdrawalParams {
-  /** The L2 batch number where the withdrawal was processed. */
-  l1BatchNumber: number | null;
-  /** The position in the L2 logs Merkle tree of the l2Log that was sent with the message. */
-  l2MessageIndex: number;
-  /** The L2 transaction number in the batch, in which the log was sent. */
-  l2TxNumberInBlock: number | null;
-  /** The L2 withdraw data, stored in an L2 -> L1 message. */
-  message: any;
-  /** The L2 address which sent the log. */
-  sender: string;
-  /** The Merkle proof of the inclusion L2 -> L1 message about withdrawal initialization. */
-  proof: string[];
 }
 
 /** Represents storage proof. */

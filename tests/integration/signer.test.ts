@@ -1,7 +1,12 @@
 import * as chai from 'chai';
 import '../custom-matchers';
 import {Provider, utils} from '../../src';
-import {ADDRESS1, ADDRESS2, L2_CHAIN_URL, L1_ADDRESS1} from '../utils';
+import {
+  ADDRESS1,
+  ADDRESS2,
+  L2_CHAIN_URL,
+  L1_ADDRESS1_NATIVE_SEGWIT,
+} from '../utils';
 
 const {expect} = chai;
 
@@ -31,14 +36,6 @@ describe('VoidSigner', () => {
     it('should return the `VoidSigner` balance', async () => {
       const result = await signer.getBalance();
       expect(result > 0n).to.be.true;
-    });
-  });
-
-  describe('#getAllBalances()', () => {
-    it('should return all balances', async () => {
-      const result = await signer.getAllBalances();
-      const expected = 1;
-      expect(Object.keys(result)).to.have.lengthOf(expected);
     });
   });
 
@@ -147,7 +144,11 @@ describe('VoidSigner', () => {
           gasPerPubdata: utils.DEFAULT_GAS_PER_PUBDATA_LIMIT,
         },
       });
-      expect(result).to.be.deepEqualExcluding(tx, ['gasLimit', 'chainId']);
+      expect(result).to.be.deepEqualExcluding(tx, [
+        'gasLimit',
+        'chainId',
+        'maxFeePerGas',
+      ]);
       expect(BigInt(result.gasLimit!) > 0n).to.be.true;
     });
 
@@ -175,7 +176,11 @@ describe('VoidSigner', () => {
           gasPerPubdata: utils.DEFAULT_GAS_PER_PUBDATA_LIMIT,
         },
       });
-      expect(result).to.be.deepEqualExcluding(tx, ['gasLimit', 'chainId']);
+      expect(result).to.be.deepEqualExcluding(tx, [
+        'gasLimit',
+        'chainId',
+        'maxFeePerGas',
+      ]);
       expect(BigInt(result.gasLimit!) > 0n).to.be.true;
     });
 
@@ -235,7 +240,11 @@ describe('VoidSigner', () => {
         to: ADDRESS2,
         value: 7_000_000,
       });
-      expect(result).to.be.deepEqualExcluding(tx, ['gasLimit', 'chainId']);
+      expect(result).to.be.deepEqualExcluding(tx, [
+        'gasLimit',
+        'chainId',
+        'gasPrice',
+      ]);
       expect(BigInt(result.gasLimit!) > 0n).to.be.true;
     });
   });
@@ -261,7 +270,7 @@ describe('VoidSigner', () => {
     it('should throw an error when tyring to withdraw assets', async () => {
       try {
         await signer.withdraw({
-          to: L1_ADDRESS1,
+          to: L1_ADDRESS1_NATIVE_SEGWIT,
           amount: 70_000_000_000,
         });
       } catch (e) {

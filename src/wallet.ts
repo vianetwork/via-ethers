@@ -11,7 +11,6 @@ import {
 } from 'ethers';
 import {
   Address,
-  BalancesMap,
   Fee,
   PaymasterParams,
   TransactionLike,
@@ -1133,24 +1132,6 @@ export class Wallet {
     blockTag: BlockTag = 'committed'
   ): Promise<bigint> {
     return this._walletL2.getBalance(token, blockTag);
-  }
-
-  /**
-   * Returns all token balances of the account.
-   *
-   * @example
-   *
-   * import { Wallet, Provider, types, utils } from 'via-ethers';
-   *
-   * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const wallet = new Wallet(PRIVATE_KEY, provider);
-   *
-   * const allBalances = await wallet.getAllBalances();
-   */
-  async getAllBalances(): Promise<BalancesMap> {
-    return this._walletL2.getAllBalances();
   }
 
   /**
