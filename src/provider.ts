@@ -23,7 +23,6 @@ import {
   TransactionResponse,
   TransactionRequest,
   TransactionStatus,
-  PriorityOpResponse,
   BalancesMap,
   TransactionReceipt,
   Block,
@@ -45,12 +44,9 @@ import {
   TransactionWithDetailedOutput,
 } from './types';
 import {
-  getL2HashFromPriorityOp,
   CONTRACT_DEPLOYER_ADDRESS,
   CONTRACT_DEPLOYER,
-  sleep,
   EIP712_TX_TYPE,
-  BOOTLOADER_FORMAL_ADDRESS,
   L2_BASE_TOKEN_ADDRESS,
   isAddressEq,
 } from './utils';
@@ -85,18 +81,10 @@ export function JsonRpcApiProvider<
     }
 
     /**
-     * Returns the addresses of the main contract and default ZKsync Era bridge contracts on both L1 and L2.
+     * Returns the bridge addresses.
      */
     contractAddresses(): {
-      bridgehubContract?: Address;
-      mainContract?: Address;
-      erc20BridgeL1?: Address;
-      erc20BridgeL2?: Address;
-      wethBridgeL1?: Address;
-      wethBridgeL2?: Address;
-      sharedBridgeL1?: Address;
-      sharedBridgeL2?: Address;
-      baseToken?: Address;
+      bridge?: Address;
     } {
       throw new Error('Must be implemented by the derived class!');
     }
@@ -297,46 +285,16 @@ export function JsonRpcApiProvider<
     }
 
     /**
-     * Returns the Bridgehub smart contract address.
-     *
-     * Calls the {@link https://docs.zksync.io/build/api.html#zks-getbridgehubcontract zks_getBridgehubContract} JSON-RPC method.
+     * Returns the L1 bridge address.
      */
-    async getBridgehubContractAddress(): Promise<Address> {
-      if (!this.contractAddresses().bridgehubContract) {
-        this.contractAddresses().bridgehubContract = await this.send(
-          'zks_getBridgehubContract',
+    async getBridgeAddress(): Promise<Address> {
+      if (!this.contractAddresses().bridge) {
+        this.contractAddresses().bridge = await this.send(
+          'via_getBridgeAddress',
           []
         );
       }
-      return this.contractAddresses().bridgehubContract!;
-    }
-
-    /**
-     * Returns the main ZKsync Era smart contract address.
-     *
-     * Calls the {@link https://docs.zksync.io/build/api.html#zks-getmaincontract zks_getMainContract} JSON-RPC method.
-     */
-    async getMainContractAddress(): Promise<Address> {
-      if (!this.contractAddresses().mainContract) {
-        this.contractAddresses().mainContract = await this.send(
-          'zks_getMainContract',
-          []
-        );
-      }
-      return this.contractAddresses().mainContract!;
-    }
-
-    /**
-     * Returns the L1 base token address.
-     */
-    async getBaseTokenContractAddress(): Promise<Address> {
-      if (!this.contractAddresses().baseToken) {
-        this.contractAddresses().baseToken = await this.send(
-          'zks_getBaseTokenL1Address',
-          []
-        );
-      }
-      return ethers.getAddress(this.contractAddresses().baseToken!);
+      return this.contractAddresses().bridge!;
     }
 
     /**
@@ -349,48 +307,6 @@ export function JsonRpcApiProvider<
       // Unlike contract's addresses, the testnet paymaster is not cached, since it can be trivially changed
       // on the fly by the server and should not be relied on to be constant
       return await this.send('zks_getTestnetPaymaster', []);
-    }
-
-    /**
-     * Returns the addresses of the default ZKsync Era bridge contracts on both L1 and L2.
-     *
-     * Calls the {@link https://docs.zksync.io/build/api.html#zks-getbridgecontracts zks_getBridgeContracts} JSON-RPC method.
-     */
-    async getDefaultBridgeAddresses(): Promise<{
-      erc20L1: string;
-      erc20L2: string;
-      wethL1: string;
-      wethL2: string;
-      sharedL1: string;
-      sharedL2: string;
-    }> {
-      if (!this.contractAddresses().erc20BridgeL1) {
-        const addresses: {
-          l1Erc20DefaultBridge: string;
-          l2Erc20DefaultBridge: string;
-          l1WethBridge: string;
-          l2WethBridge: string;
-          l1SharedDefaultBridge: string;
-          l2SharedDefaultBridge: string;
-        } = await this.send('zks_getBridgeContracts', []);
-
-        this.contractAddresses().erc20BridgeL1 = addresses.l1Erc20DefaultBridge;
-        this.contractAddresses().erc20BridgeL2 = addresses.l2Erc20DefaultBridge;
-        this.contractAddresses().wethBridgeL1 = addresses.l1WethBridge;
-        this.contractAddresses().wethBridgeL2 = addresses.l2WethBridge;
-        this.contractAddresses().sharedBridgeL1 =
-          addresses.l1SharedDefaultBridge;
-        this.contractAddresses().sharedBridgeL2 =
-          addresses.l2SharedDefaultBridge;
-      }
-      return {
-        erc20L1: this.contractAddresses().erc20BridgeL1!,
-        erc20L2: this.contractAddresses().erc20BridgeL2!,
-        wethL1: this.contractAddresses().wethBridgeL1!,
-        wethL2: this.contractAddresses().wethBridgeL2!,
-        sharedL1: this.contractAddresses().sharedBridgeL1!,
-        sharedL2: this.contractAddresses().sharedBridgeL2!,
-      };
     }
 
     /**
@@ -795,92 +711,7 @@ export function JsonRpcApiProvider<
         blockNumber
       );
     }
-
-    /**
-     * Returns a L2 transaction response from L1 transaction response.
-     *
-     * @param l1TxResponse The L1 transaction response.
-     */
-    async getL2TransactionFromPriorityOp(
-      l1TxResponse: ethers.TransactionResponse
-    ): Promise<TransactionResponse> {
-      const receipt = await l1TxResponse.wait();
-      const l2Hash = getL2HashFromPriorityOp(
-        receipt as ethers.TransactionReceipt,
-        await this.getMainContractAddress()
-      );
-
-      let status = null;
-      do {
-        status = await this.getTransactionStatus(l2Hash);
-        await sleep(this.pollingInterval);
-      } while (status === TransactionStatus.NotFound);
-
-      return await this.getTransaction(l2Hash);
-    }
-
-    /**
-     * Returns a {@link PriorityOpResponse} from L1 transaction response.
-     *
-     * @param l1TxResponse The L1 transaction response.
-     */
-    async getPriorityOpResponse(
-      l1TxResponse: ethers.TransactionResponse
-    ): Promise<PriorityOpResponse> {
-      const l2Response = {...l1TxResponse} as PriorityOpResponse;
-
-      l2Response.waitL1Commit = l1TxResponse.wait.bind(
-        l1TxResponse
-      ) as PriorityOpResponse['waitL1Commit'];
-      l2Response.wait = async () => {
-        const l2Tx = await this.getL2TransactionFromPriorityOp(l1TxResponse);
-        return await l2Tx.wait();
-      };
-      l2Response.waitFinalize = async () => {
-        const l2Tx = await this.getL2TransactionFromPriorityOp(l1TxResponse);
-        return await l2Tx.waitFinalize();
-      };
-
-      return l2Response;
-    }
-
-    async _getPriorityOpConfirmationL2ToL1Log(txHash: string, index = 0) {
-      const hash = ethers.hexlify(txHash);
-      const receipt = await this.getTransactionReceipt(hash);
-      if (!receipt) {
-        throw new Error('Transaction is not mined!');
-      }
-      const messages = Array.from(receipt.l2ToL1Logs.entries()).filter(
-        ([, log]) => isAddressEq(log.sender, BOOTLOADER_FORMAL_ADDRESS)
-      );
-      const [l2ToL1LogIndex, l2ToL1Log] = messages[index];
-
-      return {
-        l2ToL1LogIndex,
-        l2ToL1Log,
-        l1BatchTxId: receipt.l1BatchTxIndex,
-      };
-    }
-
-    /**
-     * Returns the transaction confirmation data that is part of `L2->L1` message.
-     *
-     * @param txHash The hash of the L2 transaction where the message was initiated.
-     * @param [index=0] In case there were multiple transactions in one message, you may pass an index of the
-     * transaction which confirmation data should be fetched.
-     * @throws {Error} If log proof can not be found.
-     */
-    async getPriorityOpConfirmation(txHash: string, index = 0) {
-      const {l2ToL1LogIndex, l2ToL1Log, l1BatchTxId} =
-        await this._getPriorityOpConfirmationL2ToL1Log(txHash, index);
-      const proof = await this.getLogProof(txHash, l2ToL1LogIndex);
-      return {
-        l1BatchNumber: l2ToL1Log.l1BatchNumber,
-        l2MessageIndex: proof!.id,
-        l2TxNumberInBlock: l1BatchTxId,
-        proof: proof!.proof,
-      };
-    }
+    
 
     /**
      * Returns the version of the supported account abstraction and nonce ordering from a given contract address.
@@ -949,19 +780,11 @@ export function JsonRpcApiProvider<
 export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
   #connect: FetchRequest;
   protected _contractAddresses: {
-    mainContract?: Address;
-    erc20BridgeL1?: Address;
-    erc20BridgeL2?: Address;
-    wethBridgeL1?: Address;
-    wethBridgeL2?: Address;
+    bridge?: Address;
   };
 
   override contractAddresses(): {
-    mainContract?: Address;
-    erc20BridgeL1?: Address;
-    erc20BridgeL2?: Address;
-    wethBridgeL1?: Address;
-    wethBridgeL2?: Address;
+    bridge?: Address;
   } {
     return this._contractAddresses;
   }
@@ -1224,38 +1047,10 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * import { Provider, types } from 'via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * console.log(`Main contract: ${await provider.getMainContractAddress()}`);
+   * console.log(`Bridge address: ${await provider.getBridgeAddress()}`);
    */
-  override async getMainContractAddress(): Promise<Address> {
-    return super.getMainContractAddress();
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { Provider, types } from 'via-ethers';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * console.log(`Bridgehub: ${await provider.getBridgehubContractAddress()}`);
-   */
-  override async getBridgehubContractAddress(): Promise<Address> {
-    return super.getBridgehubContractAddress();
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { Provider, types } from 'via-ethers';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * console.log(`Base token: ${await provider.getBaseTokenContractAddress()}`);
-   */
-  override async getBaseTokenContractAddress(): Promise<Address> {
-    return super.getBaseTokenContractAddress();
+  override async getBridgeAddress(): Promise<Address> {
+    return super.getBridgeAddress();
   }
 
   /**
@@ -1270,27 +1065,6 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    */
   override async getTestnetPaymasterAddress(): Promise<Address | null> {
     return super.getTestnetPaymasterAddress();
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { Provider, types, utils } from 'via-ethers';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * console.log(`Default bridges: ${utils.toJSON(await provider.getDefaultBridgeAddresses())}`);
-   */
-  override async getDefaultBridgeAddresses(): Promise<{
-    erc20L1: string;
-    erc20L2: string;
-    wethL1: string;
-    wethL2: string;
-    sharedL1: string;
-    sharedL2: string;
-  }> {
-    return super.getDefaultBridgeAddresses();
   }
 
   /**
@@ -1744,75 +1518,6 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    * @example
    *
    * import { Provider, types, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const ethProvider = ethers.getDefaultProvider('Localhost');
-   * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
-   * const l1TxResponse = await ethProvider.getTransaction(l1Tx);
-   * if (l1TxResponse) {
-   *   console.log(`Tx: ${utils.toJSON(await provider.getL2TransactionFromPriorityOp(l1TxResponse))}`);
-   * }
-   */
-  override async getL2TransactionFromPriorityOp(
-    l1TxResponse: ethers.TransactionResponse
-  ): Promise<TransactionResponse> {
-    return super.getL2TransactionFromPriorityOp(l1TxResponse);
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { Provider, types, utils } from 'via-ethers';
-   * import { ethers } from 'ethers';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * const ethProvider = ethers.getDefaultProvider('Localhost');
-   * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
-   * const l1TxResponse = await ethProvider.getTransaction(l1Tx);
-   * if (l1TxResponse) {
-   *   console.log(`Tx: ${utils.toJSON(await provider.getPriorityOpResponse(l1TxResponse))}`);
-   * }
-   */
-  override async getPriorityOpResponse(
-    l1TxResponse: ethers.TransactionResponse
-  ): Promise<PriorityOpResponse> {
-    return super.getPriorityOpResponse(l1TxResponse);
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { Provider, types, utils } from 'via-ethers';
-   *
-   * const provider = Provider.getDefaultProvider(types.Network.Localhost);
-   * // Any L2 -> L1 transaction can be used.
-   * // In this case, withdrawal transaction is used.
-   * const tx = '0x2a1c6c74b184965c0cb015aae9ea134fd96215d2e4f4979cfec12563295f610e';
-   * console.log(`Confirmation data: ${utils.toJSON(await provider.getPriorityOpConfirmation(tx, 0))}`);
-   */
-  override async getPriorityOpConfirmation(
-    txHash: string,
-    index = 0
-  ): Promise<{
-    l1BatchNumber: number;
-    l2MessageIndex: number;
-    l2TxNumberInBlock: number | null;
-    proof: string[];
-  }> {
-    return super.getPriorityOpConfirmation(txHash, index);
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { Provider, types, utils } from 'via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const tokenAddress = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
@@ -1882,28 +1587,18 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
  * This provider is designed for frontend use in a browser environment and integration for browser wallets
  * (e.g., MetaMask, WalletConnect).
  */
-export class BrowserProvider extends JsonRpcApiProvider(
-  ethers.BrowserProvider
-) {
+export class BrowserProvider extends JsonRpcApiProvider(ethers.BrowserProvider) {
   #request: (
     method: string,
     params: Array<any> | Record<string, any>
   ) => Promise<any>;
 
   protected _contractAddresses: {
-    mainContract?: Address;
-    erc20BridgeL1?: Address;
-    erc20BridgeL2?: Address;
-    wethBridgeL1?: Address;
-    wethBridgeL2?: Address;
+    bridge?: Address;
   };
 
   override contractAddresses(): {
-    mainContract?: Address;
-    erc20BridgeL1?: Address;
-    erc20BridgeL2?: Address;
-    wethBridgeL1?: Address;
-    wethBridgeL2?: Address;
+    bridge?: Address;
   } {
     return this._contractAddresses;
   }
@@ -2166,38 +1861,10 @@ export class BrowserProvider extends JsonRpcApiProvider(
    * import { BrowserProvider } from 'via-ethers';
    *
    * const provider = new BrowserProvider(window.ethereum);
-   * console.log(`Main contract: ${await provider.getMainContractAddress()}`);
+   * console.log(`Bridge address: ${await provider.getBridgeAddress()}`);
    */
-  override async getMainContractAddress(): Promise<Address> {
-    return super.getMainContractAddress();
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { BrowserProvider } from 'via-ethers';
-   *
-   * const provider = new BrowserProvider(window.ethereum);
-   * console.log(`Bridgehub: ${await provider.getBridgehubContractAddress()}`);
-   */
-  override async getBridgehubContractAddress(): Promise<Address> {
-    return super.getBridgehubContractAddress();
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { BrowserProvider } from 'via-ethers';
-   *
-   * const provider = new BrowserProvider(window.ethereum);
-   * console.log(`Base token: ${await provider.getBaseTokenContractAddress()}`);
-   */
-  override async getBaseTokenContractAddress(): Promise<Address> {
-    return super.getBaseTokenContractAddress();
+  override async getBridgeAddress(): Promise<Address> {
+    return super.getBridgeAddress();
   }
 
   /**
@@ -2212,27 +1879,6 @@ export class BrowserProvider extends JsonRpcApiProvider(
    */
   override async getTestnetPaymasterAddress(): Promise<Address | null> {
     return super.getTestnetPaymasterAddress();
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { BrowserProvider } from 'via-ethers';
-   *
-   * const provider = new BrowserProvider(window.ethereum);
-   * console.log(`Default bridges: ${utils.toJSON(await provider.getDefaultBridgeAddresses())}`);
-   */
-  override async getDefaultBridgeAddresses(): Promise<{
-    erc20L1: string;
-    erc20L2: string;
-    wethL1: string;
-    wethL2: string;
-    sharedL1: string;
-    sharedL2: string;
-  }> {
-    return super.getDefaultBridgeAddresses();
   }
 
   /**
@@ -2664,72 +2310,6 @@ export class BrowserProvider extends JsonRpcApiProvider(
     txHash: string
   ): Promise<TransactionStatus> {
     return super.getTransactionStatus(txHash);
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { BrowserProvider, utils } from 'via-ethers';
-   *
-   * const provider = new BrowserProvider(window.ethereum);
-   * const ethProvider = ethers.getDefaultProvider('Localhost');
-   * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
-   * const l1TxResponse = await ethProvider.getTransaction(l1Tx);
-   * if (l1TxResponse) {
-   *   console.log(`Tx: ${utils.toJSON(await provider.getL2TransactionFromPriorityOp(l1TxResponse))}`);
-   * }
-   */
-  override async getL2TransactionFromPriorityOp(
-    l1TxResponse: ethers.TransactionResponse
-  ): Promise<TransactionResponse> {
-    return super.getL2TransactionFromPriorityOp(l1TxResponse);
-  }
-
-  /**
-   * @inheritDoc
-   *
-   * @example
-   *
-   * import { BrowserProvider, utils } from 'via-ethers';
-   *
-   * const provider = new BrowserProvider(window.ethereum);
-   * const ethProvider = ethers.getDefaultProvider('Localhost');
-   * const l1Tx = '0xcca5411f3e514052f4a4ae1c2020badec6e0998adb52c09959c5f5ff15fba3a8';
-   * const l1TxResponse = await ethProvider.getTransaction(l1Tx);
-   * if (l1TxResponse) {
-   *   console.log(`Tx: ${utils.toJSON(await provider.getPriorityOpResponse(l1TxResponse))}`);
-   * }
-   */
-  override async getPriorityOpResponse(
-    l1TxResponse: ethers.TransactionResponse
-  ): Promise<PriorityOpResponse> {
-    return super.getPriorityOpResponse(l1TxResponse);
-  }
-
-  /**
-   *
-   * @example
-   *
-   * import { BrowserProvider, utils } from 'via-ethers';
-   *
-   * const provider = new BrowserProvider(window.ethereum);
-   * // Any L2 -> L1 transaction can be used.
-   * // In this case, withdrawal transaction is used.
-   * const tx = '0x2a1c6c74b184965c0cb015aae9ea134fd96215d2e4f4979cfec12563295f610e';
-   * console.log(`Confirmation data: ${utils.toJSON(await provider.getPriorityOpConfirmation(tx, 0))}`);
-   */
-  override async getPriorityOpConfirmation(
-    txHash: string,
-    index = 0
-  ): Promise<{
-    l1BatchNumber: number;
-    l2MessageIndex: number;
-    l2TxNumberInBlock: number | null;
-    proof: string[];
-  }> {
-    return super.getPriorityOpConfirmation(txHash, index);
   }
 
   /**

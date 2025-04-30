@@ -34,20 +34,6 @@ describe('utils', () => {
     });
   });
 
-  describe('#checkBaseCost()', () => {
-    it('should throw an error if the base cost bigger than value', async () => {
-      const baseCost = 100;
-      const value = 99;
-      try {
-        await utils.checkBaseCost(baseCost, value);
-      } catch (e) {
-        expect((e as Error).message).to.be.equal(
-          `The base cost of performing the priority operation is higher than the provided value parameter for the transaction: baseCost: ${baseCost}, provided value: ${value}!`
-        );
-      }
-    });
-  });
-
   describe('#serializeEip712()', () => {
     it('should throw an error when `tx.chainId` is not specified', async () => {
       try {

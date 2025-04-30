@@ -51,13 +51,6 @@ describe('Provider', () => {
     });
   });
 
-  describe('#getMainContractAddress()', () => {
-    it('should return the address of main contract', async () => {
-      const result = await provider.getMainContractAddress();
-      expect(result).not.to.be.null;
-    });
-  });
-
   describe('#getTestnetPaymasterAddress()', () => {
     it('should return the address of testnet paymaster', async () => {
       const result = await provider.getTestnetPaymasterAddress();
@@ -220,13 +213,6 @@ describe('Provider', () => {
   describe('#getTransactionReceipt()', () => {
     it('should return a transaction receipt', async () => {
       const result = await provider.getTransaction(receipt.hash);
-      expect(result).not.to.be.null;
-    });
-  });
-
-  describe('#getDefaultBridgeAddresses()', () => {
-    it('should return the default bridges', async () => {
-      const result = await provider.getDefaultBridgeAddresses();
       expect(result).not.to.be.null;
     });
   });
@@ -532,7 +518,7 @@ describe('Provider', () => {
     it('should return a gas estimation of the L1 transaction', async () => {
       const result = await provider.estimateGasL1({
         from: ADDRESS1,
-        to: await provider.getBridgehubContractAddress(),
+        // to: await provider.getBridgehubContractAddress(),
         value: 7_000_000_000n,
         customData: {
           gasPerPubdata: 800n,

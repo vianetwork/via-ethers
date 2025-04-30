@@ -2,7 +2,6 @@ import {BigNumberish, BlockTag, ethers} from 'ethers';
 import {Provider} from './provider';
 import {
   DEFAULT_GAS_PER_PUBDATA_LIMIT,
-  L1_BRIDGE_ADDRESS,
   NONCE_HOLDER_ADDRESS,
 } from './utils';
 import {INonceHolder__factory} from './typechain';
@@ -49,7 +48,8 @@ export abstract class AdapterL1 {
     amount: BigNumberish;
     strategy?: SelectionStrategy;
   }): Promise<string> {
-    if (!this._providerL1) throw new Error('Provider is not initialized');
+    if (!this._providerL1) throw new Error('L1 provider is not initialized');
+    if (!this._providerL2) throw new Error('L2 provider is not initialized');
 
     const {to, amount, strategy = 'default'} = transaction;
 
@@ -94,7 +94,7 @@ export abstract class AdapterL1 {
 
     const outputs = [
       {
-        address: L1_BRIDGE_ADDRESS,
+        address: await this._providerL2.getBridgeAddress(),
         amount: BigInt(amount),
       },
       {
