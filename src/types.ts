@@ -24,11 +24,11 @@ export type Address = string;
 /** 0x-prefixed, hex encoded, ECDSA signature. */
 export type Signature = string;
 
-/** Ethereum network. */
+/** Via network. */
 export enum Network {
   Mainnet = 1,
-  Localhost = 25223,
-  EraTestNode = 10,
+  Testnet = 2,
+  Localhost = 9,
 }
 
 /** Enumerated list of priority queue types. */

@@ -398,20 +398,18 @@ export class SmartAccount extends AbstractSigner {
   }
 
   /**
-   * Initiates the withdrawal process which withdraws ETH or any ERC20 token
+   * Initiates the withdrawal process which withdraws BTC
    * from the associated account on L2 network to the target account on L1 network.
    *
    * @param transaction - Withdrawal transaction request.
-   * @param transaction.token - The address of the token. ETH by default.
    * @param transaction.amount - The amount of the token to withdraw.
    * @param [transaction.to] - The address of the recipient on L1.
-   * @param [transaction.bridgeAddress] - The address of the bridge contract to be used.
    * @param [transaction.paymasterParams] - Paymaster parameters.
    * @param [transaction.overrides] - Transaction's overrides which may be used to pass l2 gasLimit, gasPrice, value, etc.
    *
    * @returns A Promise resolving to a withdrawal transaction response.
    *
-   * @example Withdraw ETH.
+   * @example Withdraw BTC.
    *
    * import { SmartAccount, Provider, types, utils } from 'via-ethers';
    *
@@ -428,7 +426,7 @@ export class SmartAccount extends AbstractSigner {
    *   amount: 10_000_000n,
    * });
    *
-   * @example Withdraw ETH using paymaster to facilitate fee payment with an ERC20 token.
+   * @example Withdraw BTC using paymaster to facilitate fee payment with an ERC20 token.
    *
    * import { SmartAccount, Provider, types, utils } from 'via-ethers';
    *
@@ -470,7 +468,7 @@ export class SmartAccount extends AbstractSigner {
   }
 
   /**
-   * Transfer ETH or any ERC20 token within the same interface.
+   * Transfer BTC or any ERC20 token within the same interface.
    *
    * @param transaction - Transfer transaction request.
    * @param transaction.to - The address of the recipient.
@@ -481,7 +479,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @returns A Promise resolving to a transfer transaction response.
    *
-   * @example Transfer ETH.
+   * @example Transfer BTC.
    *
    * import { SmartAccount, Wallet, Provider, types } from 'via-ethers';
    * import { ethers } from 'ethers';

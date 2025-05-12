@@ -154,7 +154,7 @@ export const signPayloadWithMultipleECDSA: PayloadSigner = async (
  * - Populates `data` with `0x`.
  * - Populates `customData` with `{factoryDeps=[], gasPerPubdata=utils.DEFAULT_GAS_PER_PUBDATA_LIMIT}`.
  *
- * @param tx The transaction that needs to be populated.
+ * @param transaction The transaction that needs to be populated.
  * @param [secret] The ECDSA private key used for populating the transaction.
  * @param [provider] The provider is used to fetch data from the network if it is required for signing.
  *
@@ -179,7 +179,7 @@ export const signPayloadWithMultipleECDSA: PayloadSigner = async (
  * );
  */
 export const populateTransactionECDSA: TransactionBuilder = async (
-  tx,
+  transaction,
   secret: string | SigningKey,
   provider
 ) => {
@@ -187,13 +187,13 @@ export const populateTransactionECDSA: TransactionBuilder = async (
     throw new Error('Provider is required but is not provided!');
   }
 
-  const populatedTx = {...tx};
+  const populatedTx = {...transaction};
 
   populatedTx.type = EIP712_TX_TYPE;
   populatedTx.chainId ??= (await provider.getNetwork()).chainId;
   populatedTx.value = populatedTx.value ? BigInt(populatedTx.value) : 0n;
   populatedTx.data ??= '0x';
-  populatedTx.customData = tx.customData ?? {};
+  populatedTx.customData = transaction.customData ?? {};
   populatedTx.customData.factoryDeps ??= [];
 
   populatedTx.from ??= new ethers.Wallet(secret).address;
@@ -245,7 +245,7 @@ export const populateTransactionECDSA: TransactionBuilder = async (
  * Populates missing properties meant for signing using multiple ECDSA private keys.
  * It uses {@link populateTransactionECDSA}, where the address of the first ECDSA key is set as the `secret` argument.
  *
- * @param tx The transaction that needs to be populated.
+ * @param transaction The transaction that needs to be populated.
  * @param [secret] The list of the ECDSA private keys used for populating the transaction.
  * @param [provider] The provider is used to fetch data from the network if it is required for signing.
  *
@@ -271,7 +271,7 @@ export const populateTransactionECDSA: TransactionBuilder = async (
  * );
  */
 export const populateTransactionMultisigECDSA: TransactionBuilder = async (
-  tx,
+  transaction,
   secret: string[] | SigningKey[],
   provider
 ) => {
@@ -279,5 +279,5 @@ export const populateTransactionMultisigECDSA: TransactionBuilder = async (
     throw new Error('Multiple keys are required to build the transaction!');
   }
   // estimates gas accepts only one address, so the first signer is chosen.
-  return populateTransactionECDSA(tx, secret[0], provider);
+  return populateTransactionECDSA(transaction, secret[0], provider);
 };
