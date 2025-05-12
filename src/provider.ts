@@ -771,7 +771,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * @example
    *
-   * import { Provider, types, utils } from 'via-ethers';
+   * import { Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const TX_HASH = '<YOUR_TX_HASH_ADDRESS>';
@@ -788,7 +788,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * @example
    *
-   * import { Provider, types } from 'via-ethers';
+   * import { Provider, types } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    *
@@ -809,7 +809,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * @example
    *
-   * import { Provider, types, utils } from 'via-ethers';
+   * import { Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Block: ${utils.toJSON(await provider.getBlock('latest', true))}`);
@@ -826,7 +826,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * @example
    *
-   * import { Provider, types, utils } from 'via-ethers';
+   * import { Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Logs: ${utils.toJSON(await provider.getLogs({ fromBlock: 0, toBlock: 5, address: utils.L2_BASE_TOKEN_ADDRESS }))}`);
@@ -840,7 +840,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * @example
    *
-   * import { Provider, types } from 'via-ethers';
+   * import { Provider, types } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const account = '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049';
@@ -861,7 +861,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * @example
    *
-   * import { Provider, types } from 'via-ethers';
+   * import { Provider, types } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Protocol version: ${await provider.getProtocolVersion()}`);
@@ -875,7 +875,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * @example
    *
-   * import { Provider, types, utils } from 'via-ethers';
+   * import { Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const fee = await provider.estimateFee({
@@ -894,7 +894,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * @example
    *
-   * import { Provider, types, utils } from 'via-ethers';
+   * import { Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const feeParams = await provider.getFeeParams();
@@ -909,7 +909,7 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
    *
    * @example
    *
-   * import { Provider, types } from 'via-ethers';
+   * import { Provider, types } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * console.log(`Gas price: ${await provider.getGasPrice()}`);

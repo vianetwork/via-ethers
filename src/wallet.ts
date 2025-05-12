@@ -44,7 +44,7 @@ export class WalletL1 extends AdapterL1 {
    *
    * @example
    *
-   * import { WalletL1 } from 'via-ethers';
+   * import { WalletL1 } from '@vianetwork/via-ethers';
    * import BitcoinClient from 'bitcoin-core';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
@@ -86,7 +86,7 @@ export class WalletL1 extends AdapterL1 {
    *
    * @example
    *
-   * import { WalletL1, Provider, utils } from 'via-ethers';
+   * import { WalletL1, Provider, utils } from '@vianetwork/via-ethers';
    * import BitcoinClient from 'bitcoin-core';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
@@ -122,7 +122,7 @@ export class WalletL1 extends AdapterL1 {
    *
    * @example
    *
-   * import { WalletL1, utils } from 'via-ethers';
+   * import { WalletL1, utils } from '@vianetwork/via-ethers';
    * import BitcoinClient from 'bitcoin-core';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY_IN_WIF_FORMAT>';
@@ -162,7 +162,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2, Provider, types } from 'via-ethers';
+   * import { WalletL2, Provider, types } from '@vianetwork/via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
@@ -194,7 +194,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2, Provider } from 'via-ethers';
+   * import { WalletL2, Provider } from '@vianetwork/via-ethers';
    *
    * const MNEMONIC = 'stuff slice staff easily soup parent arm payment cotton hammer scatter struggle';
    *
@@ -215,7 +215,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2 } from 'via-ethers';
+   * import { WalletL2 } from '@vianetwork/via-ethers';
    * import * as fs from 'fs';
    *
    * const wallet = await WalletL2.fromEncryptedJson(fs.readFileSync('wallet.json', 'utf8'), 'password');
@@ -241,7 +241,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2 } from 'via-ethers';
+   * import { WalletL2 } from '@vianetwork/via-ethers';
    * import * as fs from 'fs';
    *
    * const wallet = WalletL2.fromEncryptedJsonSync(fs.readFileSync('wallet.json', 'utf8'), 'password');
@@ -261,7 +261,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2, Provider } from 'via-ethers';
+   * import { WalletL2, Provider } from '@vianetwork/via-ethers';
    *
    * const provider = Provider.getDefaultProvider(types.Network.Localhost);
    * const wallet = WalletL2.createRandom(provider);
@@ -278,7 +278,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2, Provider, types } from 'via-ethers';
+   * import { WalletL2, Provider, types } from '@vianetwork/via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    * const unconnectedWallet = new Wallet(PRIVATE_KEY);
@@ -295,7 +295,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2, Provider, types } from 'via-ethers';
+   * import { WalletL2, Provider, types } from '@vianetwork/via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
@@ -332,7 +332,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   * import { WalletL2, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
@@ -358,7 +358,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   * import { WalletL2, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
@@ -383,7 +383,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   * import { WalletL2, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
@@ -409,7 +409,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example
    *
-   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   * import { WalletL2, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
@@ -482,7 +482,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example Withdraw BTC.
    *
-   * import { WalletL2, Provider, types, utils } from 'via-ethers';
+   * import { WalletL2, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    *
@@ -497,7 +497,7 @@ export class WalletL2 extends AdapterL2 {
    *
    * @example Withdraw BTC using paymaster to facilitate fee payment with an ERC20 token.
    *
-   * import { Wallet, Provider, types, utils } from 'via-ethers';
+   * import { Wallet, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const PRIVATE_KEY = '<WALLET_PRIVATE_KEY>';
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free

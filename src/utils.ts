@@ -135,7 +135,7 @@ export const DEFAULT_GAS_PER_PUBDATA_LIMIT = 50_000;
  *
  * @example
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  *
  * await utils.sleep(1_000);
  */
@@ -153,7 +153,7 @@ export function sleep(millis: number): Promise<unknown> {
  *
  * @example
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  *
  * const withdrawETHMessage = '0x6c0960f936615cf349d7f6344891b1e7ca7c72883f5dc04900000000000000000000000000000000000000000000000000000001a13b8600';
  * const withdrawETHMessageHash = utils.getHashedL2ToL1Msg('0x36615Cf349d7F6344891B1e7CA7C72883F5dc049', withdrawETHMessage, 0);
@@ -183,7 +183,7 @@ export function getHashedL2ToL1Msg(
  *
  * @example
  *
- * import { Provider, types, utils } from 'via-ethers';
+ * import { Provider, types, utils } from '@vianetwork/via-ethers';
  *
  * const provider = Provider.getDefaultProvider(types.Network.Localhost);
  *
@@ -233,7 +233,7 @@ export function getDeployedContracts(
  *
  * @example
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  *
  * const address = utils.create2Address('0x36615Cf349d7F6344891B1e7CA7C72883F5dc049', '0x010001cb6a6e8d5f6829522f19fa9568660e0a9cd53b2e8be4deb0a679452e41', '0x01', '0x01');
  * // address = '0x29bac3E5E8FFE7415F97C956BFA106D70316ad50'
@@ -268,7 +268,7 @@ export function create2Address(
  *
  * @example
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  *
  * const address = utils.createAddress('0x36615Cf349d7F6344891B1e7CA7C72883F5dc049', 1);
  * // address = '0x4B5DF730c2e6b28E17013A1485E5d9BC41Efe021'
@@ -303,7 +303,7 @@ export function createAddress(
  *
  * @example Serialize EIP712 transaction without signature.
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  *
  * const serializedTx = utils.serializeEip712({ chainId: 270, from: '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049' }, null);
  *
@@ -311,7 +311,7 @@ export function createAddress(
  *
  * @example Serialize EIP712 transaction with signature.
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  * import { ethers } from 'ethers';
  *
  * const signature = ethers.Signature.from('0x73a20167b8d23b610b058c05368174495adf7da3a4ed4a57eb6dbdeb1fafc24aaf87530d663a0d061f69bb564d2c6fb46ae5ae776bbd4bd2a2a4478b9cd1b42a');
@@ -404,7 +404,7 @@ export function serializeEip712(
  *
  * @example
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  *
  * const bytecode =
  *   '0x000200000000000200010000000103550000006001100270000000130010019d0000008001000039000000400010043f0000000101200190000000290000c13d0000000001000031000000040110008c000000420000413d0000000101000367000000000101043b000000e001100270000000150210009c000000310000613d000000160110009c000000420000c13d0000000001000416000000000110004c000000420000c13d000000040100008a00000000011000310000001702000041000000200310008c000000000300001900000000030240190000001701100197000000000410004c000000000200a019000000170110009c00000000010300190000000001026019000000000110004c000000420000c13d00000004010000390000000101100367000000000101043b000000000010041b0000000001000019000000490001042e0000000001000416000000000110004c000000420000c13d0000002001000039000001000010044300000120000004430000001401000041000000490001042e0000000001000416000000000110004c000000420000c13d000000040100008a00000000011000310000001702000041000000000310004c000000000300001900000000030240190000001701100197000000000410004c000000000200a019000000170110009c00000000010300190000000001026019000000000110004c000000440000613d00000000010000190000004a00010430000000000100041a000000800010043f0000001801000041000000490001042e0000004800000432000000490001042e0000004a00010430000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0000000200000000000000000000000000000040000001000000000000000000000000000000000000000000000000000000000000000000000000006d4ce63c0000000000000000000000000000000000000000000000000000000060fe47b18000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000080000000000000000000000000000000000000000000000000000000000000000000000000000000009c8c8fa789967eb514f3ec9def748480945cc9b10fcbd1a19597d924eb201083';
@@ -463,7 +463,7 @@ export function hashBytecode(bytecode: ethers.BytesLike): Uint8Array {
  *
  * @example
  *
- * import { utils, types } from 'via-ethers';
+ * import { utils, types } from '@vianetwork/via-ethers';
  *
  * const serializedTx =
  *   '0x71f87f8080808094a61464658afeaf65cccaafd3a512b69a83b77618830f42408001a073a20167b8d23b610b058c05368174495adf7da3a4ed4a57eb6dbdeb1fafc24aa02f87530d663a0d061f69bb564d2c6fb46ae5ae776bbd4bd2a2a4478b9cd1b42a82010e9436615cf349d7f6344891b1e7ca7c72883f5dc04982c350c080c0';
@@ -584,7 +584,7 @@ export function parseEip712(payload: ethers.BytesLike): TransactionLike {
  *
  * @example Get custom signature from the EIP712 transaction.
  *
- * import { utils, types } from 'via-ethers';
+ * import { utils, types } from '@vianetwork/via-ethers';
  *
  * const tx: types.TransactionLike = {
  *   type: 113,
@@ -617,7 +617,7 @@ export function parseEip712(payload: ethers.BytesLike): TransactionLike {
  *
  * @example Get Ethereum transaction signature.
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  * import { ethers } from 'ethers';
  *
  * const ethSignature = ethers.Signature.from(
@@ -660,7 +660,7 @@ function getSignature(
  *
  * @example Get transaction hash using custom signature from the transaction.
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  *
  * const tx: types.TransactionRequest = {
  *   type: 113,
@@ -692,7 +692,7 @@ function getSignature(
  *
  * @example Get transaction hash using Ethereum signature.
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  * import { ethers } from 'ethers';
  *
  * const tx: types.TransactionRequest = {
@@ -732,7 +732,7 @@ export function eip712TxHash(
  *
  * @example
  *
- * import { Wallet, utils } from 'via-ethers';
+ * import { Wallet, utils } from '@vianetwork/via-ethers';
  * import { ethers } from 'ethers';
  *
  * const ADDRESS = '<WALLET_ADDRESS>';
@@ -775,7 +775,7 @@ function isECDSASignatureCorrect(
  *
  * @example
  *
- * import { MultisigECDSASmartAccount, Provider, utils } from 'via-ethers';
+ * import { MultisigECDSASmartAccount, Provider, utils } from '@vianetwork/via-ethers';
  * import { ethers } from 'ethers';
  *
  * const ADDRESS = '<MULTISIG ACCOUNT ADDRESS>';
@@ -826,7 +826,7 @@ async function isEIP1271SignatureCorrect(
  *
  * @example
  *
- * import { Provider, utils } from 'via-ethers';
+ * import { Provider, utils } from '@vianetwork/via-ethers';
  * import { ethers } from 'ethers';
  *
  * const ADDRESS = '0x36615Cf349d7F6344891B1e7CA7C72883F5dc049';
