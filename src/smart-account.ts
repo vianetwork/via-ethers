@@ -69,7 +69,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { SmartAccount, Provider, types } from 'via-ethers';
+   * import { SmartAccount, Provider, types } from '@vianetwork/via-ethers';
    *
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -100,7 +100,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { Wallet, Provider, types } from 'via-ethers';
+   * import { Wallet, Provider, types } from '@vianetwork/via-ethers';
    *
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -131,7 +131,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { SmartAccount, Provider, types } from 'via-ethers';
+   * import { SmartAccount, Provider, types } from '@vianetwork/via-ethers';
    *
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -156,7 +156,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { SmartAccount, Provider, types } from 'via-ethers';
+   * import { SmartAccount, Provider, types } from '@vianetwork/via-ethers';
    *
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -185,7 +185,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { SmartAccount, Provider, types } from 'via-ethers';
+   * import { SmartAccount, Provider, types } from '@vianetwork/via-ethers';
    *
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -214,7 +214,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { SmartAccount, Provider, types, utils } from 'via-ethers';
+   * import { SmartAccount, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -254,7 +254,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { SmartAccount, Provider, types } from 'via-ethers';
+   * import { SmartAccount, Provider, types } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const ADDRESS = '<ADDRESS>';
@@ -294,7 +294,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { SmartAccount, Provider, types } from 'via-ethers';
+   * import { SmartAccount, Provider, types } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const ADDRESS = '<ADDRESS>';
@@ -326,7 +326,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { SmartAccount, Provider, types } from 'via-ethers';
+   * import { SmartAccount, Provider, types } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const ADDRESS = '<ADDRESS>';
@@ -353,7 +353,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example
    *
-   * import { SmartAccount, Provider, types } from 'via-ethers';
+   * import { SmartAccount, Provider, types } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const ADDRESS = '<ADDRESS>';
@@ -411,7 +411,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example Withdraw BTC.
    *
-   * import { SmartAccount, Provider, types, utils } from 'via-ethers';
+   * import { SmartAccount, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -428,7 +428,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example Withdraw BTC using paymaster to facilitate fee payment with an ERC20 token.
    *
-   * import { SmartAccount, Provider, types, utils } from 'via-ethers';
+   * import { SmartAccount, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const ADDRESS = '<ADDRESS>';
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -481,7 +481,7 @@ export class SmartAccount extends AbstractSigner {
    *
    * @example Transfer BTC.
    *
-   * import { SmartAccount, Wallet, Provider, types } from 'via-ethers';
+   * import { SmartAccount, Wallet, Provider, types } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const ADDRESS = '<ADDRESS>';

@@ -40,7 +40,7 @@ To begin, it is useful to have a basic understanding of the types of objects ava
 ## 📥 Installation & Setup
 
 ```bash
-yarn add via-ethers
+yarn add @vianetwork/via-ethers
 yarn add ethers@6 # ethers is a peer dependency of via-ethers
 ```
 
@@ -49,7 +49,7 @@ yarn add ethers@6 # ethers is a peer dependency of via-ethers
 ### Connect to the Via network:
 
 ```ts
-import {Provider, utils, types} from 'via-ethers';
+import {Provider, utils, types} from '@vianetwork/via-ethers';
 import BitcoinClient from 'bitcoin-core';
 
 const provider = Provider.getDefaultProvider(types.Network.Testnet); // Via testnet (L2)
@@ -76,7 +76,7 @@ const block = await provider.getBlock('latest');
 ### Create a wallet
 
 ```ts
-import {Wallet} from 'via-ethers';
+import {Wallet} from '@vianetwork/via-ethers';
 import {TEST_NETWORK} from "@scure/btc-signer/src/utils";
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;

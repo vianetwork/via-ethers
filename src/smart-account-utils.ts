@@ -10,7 +10,7 @@ import {TransactionLike, TransactionBuilder, PayloadSigner} from './types';
  *
  * @example Sign EIP712 transaction hash.
  *
- * import { EIP712Signer, types, utils } from 'via-ethers';
+ * import { EIP712Signer, types, utils } from '@vianetwork/via-ethers';
  *
  * const PRIVATE_KEY = '<PRIVATE_KEY>';
  *
@@ -26,7 +26,7 @@ import {TransactionLike, TransactionBuilder, PayloadSigner} from './types';
  *
  * @example Sign message hash.
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  * import { hashMessage } from 'ethers';
  *
  * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -38,7 +38,7 @@ import {TransactionLike, TransactionBuilder, PayloadSigner} from './types';
  *
  * @example Sign typed data hash.
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  * import { TypedDataEncoder } from 'ethers';
  *
  * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -74,7 +74,7 @@ export const signPayloadWithECDSA: PayloadSigner = async (
  *
  * @example Sign EIP712 transaction hash.
  *
- * import { EIP712Signer, types, utils } from 'via-ethers';
+ * import { EIP712Signer, types, utils } from '@vianetwork/via-ethers';
  *
  * const PRIVATE_KEY1 = '<PRIVATE_KEY1>';
  * const PRIVATE_KEY2 = '<PRIVATE_KEY2>';
@@ -91,7 +91,7 @@ export const signPayloadWithECDSA: PayloadSigner = async (
  *
  * @example Sign message hash.
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  * import { hashMessage } from 'ethers';
  *
  * const PRIVATE_KEY1 = '<PRIVATE_KEY1>';
@@ -104,7 +104,7 @@ export const signPayloadWithECDSA: PayloadSigner = async (
  *
  * @example Sign typed data hash.
  *
- * import { utils } from 'via-ethers';
+ * import { utils } from '@vianetwork/via-ethers';
  * import { TypedDataEncoder } from 'ethers';
  *
  * const PRIVATE_KEY1 = '<PRIVATE_KEY1>';
@@ -162,7 +162,7 @@ export const signPayloadWithMultipleECDSA: PayloadSigner = async (
  *
  * @example
  *
- * import { Provider, types, utils } from 'via-ethers';
+ * import { Provider, types, utils } from '@vianetwork/via-ethers';
  *
  * const PRIVATE_KEY = '<PRIVATE_KEY>';
  *
@@ -253,7 +253,7 @@ export const populateTransactionECDSA: TransactionBuilder = async (
  *
  * @example
  *
- * import { Provider, types, utils } from 'via-ethers';
+ * import { Provider, types, utils } from '@vianetwork/via-ethers';
  *
  * const PRIVATE_KEY1 = '<PRIVATE_KEY1>';
  * const PRIVATE_KEY2 = '<PRIVATE_KEY2>';

@@ -47,7 +47,7 @@ export class EIP712Signer {
   /**
    * @example
    *
-   * import { Provider, types, EIP712Signer } from 'via-ethers';
+   * import { Provider, types, EIP712Signer } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -73,7 +73,7 @@ export class EIP712Signer {
    *
    * @example
    *
-   * import { EIP712Signer } from 'via-ethers';
+   * import { EIP712Signer } from '@vianetwork/via-ethers';
    *
    * const tx = EIP712Signer.getSignInput({
    *   type: utils.EIP712_TX_TYPE,
@@ -124,7 +124,7 @@ export class EIP712Signer {
    *
    * @example
    *
-   * import { Provider, types, EIP712Signer } from 'via-ethers';
+   * import { Provider, types, EIP712Signer } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -159,7 +159,7 @@ export class EIP712Signer {
    *
    * @example
    *
-   * import { EIP712Signer } from 'via-ethers';
+   * import { EIP712Signer } from '@vianetwork/via-ethers';
    *
    * const hash = EIP712Signer.getSignedDigest({
    *   type: utils.EIP712_TX_TYPE,
@@ -194,7 +194,7 @@ export class EIP712Signer {
    *
    * @example
    *
-   * import { Provider, types, EIP712Signer } from 'via-ethers';
+   * import { Provider, types, EIP712Signer } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const PRIVATE_KEY = '<PRIVATE_KEY>';
@@ -235,7 +235,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from '@vianetwork/via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = new Signer(
@@ -270,7 +270,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from '@vianetwork/via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -292,7 +292,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from '@vianetwork/via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -311,7 +311,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Get BTC balance.
    *
-   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from '@vianetwork/via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -323,7 +323,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Get token balance.
    *
-   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from '@vianetwork/via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -347,7 +347,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example
    *
-   * import { BrowserProvider, Signer, Provider, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types } from '@vianetwork/via-ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
    * const signer = Signer.from(
@@ -366,7 +366,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Withdraw BTC.
    *
-   * import { BrowserProvider, Signer, Provider, types, utils } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types, utils } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
@@ -384,7 +384,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Withdraw BTC using paymaster to facilitate fee payment with an ERC20 token.
    *
-   * import { BrowserProvider, Signer, Provider, types, utils } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, types, utils } from '@vianetwork/via-ethers';
    *
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
    * const paymaster = '0x13D0D8550769f59aa241a41897D4859c87f7Dd46'; // Paymaster for Crown token
@@ -422,7 +422,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Transfer BTC.
    *
-   * import { BrowserProvider, Signer, Provider, Wallet, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, Wallet, types } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const browserProvider = new BrowserProvider(window.ethereum);
@@ -443,7 +443,7 @@ export class Signer extends AdapterL2 implements ethers.Signer {
    *
    * @example Transfer BTC using paymaster to facilitate fee payment with an ERC20 token.
    *
-   * import { BrowserProvider, Signer, Provider, Wallet, types } from 'via-ethers';
+   * import { BrowserProvider, Signer, Provider, Wallet, types } from '@vianetwork/via-ethers';
    * import { ethers } from 'ethers';
    *
    * const token = '0x927488F48ffbc32112F1fF721759649A89721F8F'; // Crown token which can be minted for free
