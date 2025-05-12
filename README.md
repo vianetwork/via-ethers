@@ -44,6 +44,100 @@ yarn add via-ethers
 yarn add ethers@6 # ethers is a peer dependency of via-ethers
 ```
 
+## 📝 Examples
+
+### Connect to the Via network:
+
+```ts
+import {Provider, utils, types} from 'via-ethers';
+import BitcoinClient from 'bitcoin-core';
+
+const provider = Provider.getDefaultProvider(types.Network.Testnet); // Via testnet (L2)
+const providerL1 = new BitcoinClient({ // Bitcoin testnet (L1)
+  host: 'http://127.0.0.1:18332',
+  username: 'rpcuser',
+  password: 'rpcpassword',
+  wallet: 'personal',
+});
+```
+
+### Get the latest block number
+
+```ts
+const blockNumber = await provider.getBlockNumber();
+```
+
+### Get the latest block
+
+```ts
+const block = await provider.getBlock('latest');
+```
+
+### Create a wallet
+
+```ts
+import {Wallet} from 'via-ethers';
+import {TEST_NETWORK} from "@scure/btc-signer/src/utils";
+
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const L1_PRIVATE_KEY = process.env.L1_PRIVATE_KEY; // in WIF format
+const L1_ADDRESS = process.env.L1_ADDRESS; 
+
+const wallet = new Wallet(
+  PRIVATE_KEY,
+  provider,
+  L1_PRIVATE_KEY,
+  L1_ADDRESS,
+  providerL1,
+  TEST_NETWORK
+);
+```
+
+### Check account balances
+
+```ts
+const balance = await wallet.getBalance();
+```
+
+### Transfer funds
+
+Transfer funds among accounts on L2 network.
+
+```ts
+const receiver = Wallet.createRandom();
+
+const tx = await wallet.transfer({
+  to: receiver.address,
+  amount: 7_000_000_000n,
+});
+const receipt = await tx.wait();
+```
+
+### Deposit funds
+
+Transfer funds from L1 to L2 network.
+
+```ts
+const receiver = Wallet.createRandom();
+
+const tx = await wallet.deposit({
+  to: receiver.address,
+  amount: 70_000_000n,
+});
+```
+
+### Withdraw funds
+
+Transfer funds from L2 to L1 network.
+
+```ts
+const withdrawal = await wallet.withdraw({
+  to: L1_ADDRESS,
+  amount: 70_000_000n,
+});
+const receipt = await tx.wait();
+```
+
 ## 🤝 Contributing
 
 We welcome contributions from the community! If you're interested in contributing to the `via-ethers` JavaScript SDK,

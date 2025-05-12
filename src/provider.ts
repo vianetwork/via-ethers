@@ -1457,8 +1457,8 @@ export class Provider extends JsonRpcApiProvider(ethers.JsonRpcProvider) {
     switch (zksyncNetwork) {
       case ZkSyncNetwork.Localhost:
         return new Provider('http://127.0.0.1:3050');
-      case ZkSyncNetwork.EraTestNode:
-        return new Provider('http://127.0.0.1:8011');
+      case ZkSyncNetwork.Testnet:
+        return new Provider('https://via.testnet.viablockchain.dev');
       default:
         return new Provider('http://127.0.0.1:3050');
     }

@@ -144,7 +144,7 @@ export class WalletL1 extends AdapterL1 {
 }
 
 /**
- * A `Wallet` is an extension {@link WalletL2} providing actions for L2 network.
+ * A `WalletL2` provides actions for L2 network.
  */
 export class WalletL2 extends AdapterL2 {
   /** The EIP712 signer for signing EIP712 transaction. */
@@ -760,7 +760,7 @@ export class WalletL2 extends AdapterL2 {
 }
 
 /**
- * A `Wallet` is a composition of {@link WalletL1} and {@link WalletL2} providing actions across networks.
+ * A `Wallet` provides actions across both networks.
  * It facilitates bridging assets between different networks through a unified API.
  * Methods and properties that interact with the L1 network have an `L1` suffix.
  */
