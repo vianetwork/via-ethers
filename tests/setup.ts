@@ -178,7 +178,7 @@ async function sendToL2() {
     to: wallet.address,
     amount: 10_000_000_000n,
   });
-  await sleep(5000);
+  await sleep(10_000);
 }
 
 async function main() {
