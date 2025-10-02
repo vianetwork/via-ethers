@@ -574,7 +574,7 @@ describe('Provider', () => {
         expect(
           (e as Error).message
             .toString()
-            .includes('insufficient balance for transfer')
+            .includes('insufficient funds')
         ).to.be.true;
       }
     });

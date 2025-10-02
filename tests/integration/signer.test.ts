@@ -87,7 +87,7 @@ describe('VoidSigner', () => {
       ]);
       expect(BigInt(result.gasLimit!) > 0n).to.be.true;
       expect(BigInt(result.maxFeePerGas!) > 0n).to.be.true;
-      expect(BigInt(result.maxPriorityFeePerGas!) > 0n).to.be.true;
+      expect(BigInt(result.maxPriorityFeePerGas!) == 0n).to.be.true;
     });
 
     it('should return populated transaction when `maxFeePerGas` and `maxPriorityFeePerGas` and `customData` are provided', async () => {
@@ -162,7 +162,7 @@ describe('VoidSigner', () => {
         data: '0x',
         chainId: 270n,
         maxFeePerGas: 3_500_000_000n,
-        maxPriorityFeePerGas: 1_000_000_000n,
+        maxPriorityFeePerGas: 0n,
         customData: {
           gasPerPubdata: utils.DEFAULT_GAS_PER_PUBDATA_LIMIT,
           factoryDeps: [],
